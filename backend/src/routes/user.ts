@@ -63,12 +63,13 @@ router.post("/login", async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "3h",
+      expiresIn: "1h",
     });
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
+      sameSite: "lax",
       maxAge: 60 * 60 * 1000,
     });
 
@@ -80,7 +81,11 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 router.post("/logout", (req: Request, res: Response) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
   res.json({ message: "Logged out successfully" });
 });
 
