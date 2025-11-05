@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id            String                 @id @default(uuid())
+  username      String                 @unique
+  fname         String
+  lname         String
+  email         String                 @unique
+  password      String
+  registrations ActivityRegistration[]
+}
+
+model Activity {
+  id            String                 @id @default(uuid())
+  title         String
+  description   String?
+  category      String
+  location      String
+  start_date    DateTime
+  end_date      DateTime
+  slots         Int
+  occupied      Int
+  organizer     String
+  createdAt     DateTime               @default(now())
+  registrations ActivityRegistration[]
+}
+
+model ActivityRegistration {
+  user         Users    @relation(fields: [userId], references: [id])
+  userId       String
+  activity     Activity @relation(fields: [activityId], references: [id])
+  activityId   String
+  registeredAt DateTime @default(now())
+
+  @@id([userId, activityId])
+}

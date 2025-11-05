@@ -1,7 +1,7 @@
 export interface User {
   id: number;
-  name: string;
+  username: string;
+  fname: string;
+  lname: string;
   email: string;
-  role: 'volunteer' | 'organizer';
-  created_at: string;
 }

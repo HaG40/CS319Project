@@ -10,3 +10,4 @@ app.get('/', (req, res) => {
     res.json({ message: 'Hello Express + TypeScript!' });
 });
 app.listen(port, () => console.log(`Application is running on port ${port}`));
+//# sourceMappingURL=server.js.map
