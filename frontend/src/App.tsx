@@ -5,7 +5,6 @@ import Header from './components/Header'
 import User from './components/User'
 import Login from './components/Login'
 import Register from './components/Register'
-import Activity from './components/Activity'
 
 function App() {
   return (
@@ -13,10 +12,10 @@ function App() {
     <Header/>
     <Routes>
       <Route path='/' element={<LandingPage/>}/>
+      <Route path='/category/:category' element={<LandingPage/>}/>
       <Route path='/user' element={<User/>}/>
       <Route path='/user/login' element={<Login/>}/>
       <Route path='/user/register' element={<Register/>}/>
-      <Route path='/activity/:id' element={<Activity/>}/>
     </Routes>
     </>
   )
