@@ -1,41 +1,24 @@
-import axios from "axios"
 import React, { useEffect } from "react"
 import type { Activity } from "../types/Activity"
 import SideBar from "./SideBar"
 import formatDate from "../utils/FormatDate"
 import { useParams } from "react-router-dom"
+import { useActivityStore } from "../store/activityStore"
 
 function LandingPage () {
 
-    const [activities, setActivities] = React.useState<Activity[]>([])
-    const [isLoading, setIsLoading] = React.useState(false)
-    const { category } = useParams<{ category: string }>()
     
     const [isOpen, setIsOpen] = React.useState(false);
     const [selectedActivity, setSelectedActivity] = React.useState<Activity | null>(null);
 
-    const fetchData = async () => {
-        try {
-            if (category) {
-                const response = await axios.get(`http://localhost:3000/api/act/${category}`);
-                setActivities(response.data);
-                return;
-            }
-            const response = await axios.get(`http://localhost:3000/api/act/`);
-            setActivities(response.data);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }   
-    }
+    const { category } = useParams<{ category: string }>();
+    const { activities, isLoading, fetchAll, fetchByCategory } = useActivityStore();
 
-    useEffect(() => {
-        const load = async () => {
-            setIsLoading(true);
-            await fetchData();
-            setIsLoading(false);
-        };
-        load();
-    }, [category]);
+  useEffect(() => {
+    if (category) fetchByCategory(category);
+    else fetchAll();
+  }, [category]);
+
 
     const openModal = (activity: Activity) => {
         setSelectedActivity(activity);

@@ -1,4 +1,4 @@
-import express, { Router, Request, Response } from "express";
+import express, { Router, Request, Response, NextFunction } from "express";
 import { PrismaClient } from "../generated/prisma";
 import { genSalt, hash, compare } from "bcrypt-ts";
 import jwt from "jsonwebtoken";
@@ -7,120 +7,93 @@ const prisma = new PrismaClient();
 const router: Router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-router.post("/register", async (req: Request, res: Response) => {
+interface TokenPayload {
+  id: string;
+  email: string;
+}
+
+// ✅ MIDDLEWARE ตรวจ TOKEN
+const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies?.token;
+
+  if (!token) return res.status(401).json({ error: "No token provided" });
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+    (req as any).user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Token invalid or expired" });
+  }
+};
+
+// ✅ REGISTER
+router.post("/register", async (req, res) => {
   try {
     const { username, fname, lname, email, password } = req.body;
 
     if (!username || !fname || !lname || !email || !password) {
-      return res.status(400).send({ error: "All fields are required" });
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-    const existingUser = await prisma.users.findFirst({
+    const existing = await prisma.users.findFirst({
       where: { OR: [{ username }, { email }] },
     });
 
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ error: "Username or Email already exists" });
+    if (existing) {
+      return res.status(400).json({ error: "User already exists" });
     }
 
     const salt = await genSalt();
     const hashedPassword = await hash(password, salt);
 
     const user = await prisma.users.create({
-      data: {
-        username,
-        fname,
-        lname,
-        email,
-        password: hashedPassword,
-      },
+      data: { username, fname, lname, email, password: hashedPassword },
     });
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user: { id: user.id, username: user.username, email: user.email },
-    });
-  } catch (err: any) {
-    console.error(err);
+    res.json({ message: "Registered", user });
+  } catch {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-router.post("/login", async (req: Request, res: Response) => {
-  try {
-    const { username, password } = req.body;
+// ✅ LOGIN
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ error: "Username and password are required" });
-    }
+  const user = await prisma.users.findFirst({ where: { username } });
+  if (!user) return res.status(404).json({ error: "User not found" });
 
-    const user = await prisma.users.findFirst({
-      where: { username },
-    });
+  const valid = await compare(password, user.password);
+  if (!valid) return res.status(400).json({ error: "Invalid credentials" });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
-    const isPasswordValid = await compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return res.status(400).json({ error: "Invalid credentials" });
-    }
-
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 1000,
-    });
-
-    res.json({ message: "Login successful", token });
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-router.post("/logout", (req: Request, res: Response) => {
-  res.clearCookie("token", {
+  res.cookie("token", token, {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
+    maxAge: 60 * 60 * 1000,
   });
-  res.json({ message: "Logged out successfully" });
+
+  res.json({
+    message: "Login success",
+    user: {
+      id: user.id,
+      username: user.username,
+      fname: user.fname,
+      lname: user.lname,
+      email: user.email,
+    },
+  });
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-
-    const user = await prisma.users.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        username: true,
-        fname: true,
-        lname: true,
-        email: true,
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.json(user);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+// ✅ LOGOUT
+router.post("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.json({ message: "Logged out" });
 });
 
 export default router;

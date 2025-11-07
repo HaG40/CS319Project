@@ -1,11 +1,12 @@
-import { Link, redirect } from "react-router-dom";
-import axios from "axios";
+import { Link } from "react-router-dom";
 import React from "react";
+import { useUserStore } from "../store/userStore";
 
 function Login() {
+
+  const { login, isAuthenticated } = useUserStore();
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
   const [errorMessage, setErrorMessage] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -22,15 +23,14 @@ function Login() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/user/login",
-        { username, password },
-        { withCredentials: true }
-      );
+      const succes = await login(username, password);
+      if (!succes) {
+        setErrorMessage("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        setLoading(false);
+        return;
+      }
 
-      console.log("Login successful:", response.data);
-      setIsAuthenticated(true);
-      window.location.replace("/");
+      if(succes) window.location.replace("/");
 
     } catch (error: any) {
       console.error("Login failed:", error);
