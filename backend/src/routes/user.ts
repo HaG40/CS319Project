@@ -11,6 +11,10 @@ router.post("/register", async (req: Request, res: Response) => {
   try {
     const { username, fname, lname, email, password } = req.body;
 
+    if (!username || !fname || !lname || !email || !password) {
+      return res.status(400).send({ error: "All fields are required" });
+    }
+
     const existingUser = await prisma.users.findFirst({
       where: { OR: [{ username }, { email }] },
     });
@@ -47,6 +51,10 @@ router.post("/register", async (req: Request, res: Response) => {
 router.post("/login", async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required" });
+    }
 
     const user = await prisma.users.findFirst({
       where: { username },
@@ -93,7 +101,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const user = await prisma.users.findFirst({
+    const user = await prisma.users.findUnique({
       where: { id },
       select: {
         id: true,

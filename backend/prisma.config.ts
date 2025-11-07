@@ -7,6 +7,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL"),
+    url: "postgresql://postgres:JorJayDB@localhost:5432/VolunThaiDB?schema=public",
   },
 });

@@ -4,8 +4,8 @@ export interface Activity {
   description: string;
   category: string;
   location: string;
-  date: string;
-  time: string;
+  start_date: string;
+  end_date: string;
   slots: number;
   occupied?: number;
   organizer: string;

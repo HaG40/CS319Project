@@ -1,22 +1,14 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "Users" (
+    "id" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "fname" TEXT NOT NULL,
+    "lname" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
 
-  - The primary key for the `Users` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - You are about to drop the column `createdAt` on the `Users` table. All the data in the column will be lost.
-  - A unique constraint covering the columns `[email]` on the table `Users` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `fname` to the `Users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `lname` to the `Users` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "Users" DROP CONSTRAINT "Users_pkey",
-DROP COLUMN "createdAt",
-ADD COLUMN     "fname" TEXT NOT NULL,
-ADD COLUMN     "lname" TEXT NOT NULL,
-ALTER COLUMN "id" DROP DEFAULT,
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ADD CONSTRAINT "Users_pkey" PRIMARY KEY ("id");
-DROP SEQUENCE "Users_id_seq";
+    CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Activity" (
@@ -43,6 +35,9 @@ CREATE TABLE "ActivityRegistration" (
 
     CONSTRAINT "ActivityRegistration_pkey" PRIMARY KEY ("userId","activityId")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_username_key" ON "Users"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
