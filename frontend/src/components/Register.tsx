@@ -14,23 +14,26 @@ function Register() {
 
   const [errorMessage, setErrorMessage] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [require, setRequire] = React.useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");     
     setLoading(true);         
 
-    if (!username || !password) {
-      setErrorMessage("กรุณากรอกทั้งชื่อผู้ใช้และรหัสผ่าน");
+    if (!username || !password || !email || !fname || !lname) {
+      setErrorMessage("กรุณากรอกทั้งข้อมูลให้ครบถ้วน");
+      setRequire(true)
       setLoading(false);
       return;
-    }
+    } 
 
     try {
       const succes = await register(username,fname,lname,email, password);
       if (!succes) {
         setErrorMessage("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
         setLoading(false);
+        setRequire(false)
         return;
       }
 
@@ -62,17 +65,25 @@ function Register() {
           <p className="text-2xl font-bold flex justify-center mb-2">Register</p>
 
           <div className="flex flex-col gap-1">
+            <div className="flex flex-row justify-start"> 
+            {require && !lname && <p className="text-red-500 mr-1 items-baseline">*</p>}
             <label className="text-gray-700">Username</label>
+            </div>
+
             <input
               className="input input-bordered w-full border border-gray-300 shadow p-1"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
+
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-gray-700">ชื่อ</label>
+            <div className="flex flex-row justify-start"> 
+            {require && !lname && <p className="text-red-500 mr-1 items-baseline">*</p>}
+            <label className="text-gray-700">ชื่อจริง</label>
+            </div>
             <input
               className="input input-bordered w-full border border-gray-300 shadow p-1"
               type="text"
@@ -82,7 +93,10 @@ function Register() {
           </div>
 
         <div className="flex flex-col gap-1">
+            <div className="flex flex-row justify-start"> 
+            {require && !lname && <p className="text-red-500 mr-1 items-baseline">*</p>}
             <label className="text-gray-700">นามสกุล</label>
+            </div>
             <input
               className="input input-bordered w-full border border-gray-300 shadow p-1"
               type="text"
@@ -92,20 +106,27 @@ function Register() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-gray-700">Email</label>
+            <div className="flex flex-row justify-start"> 
+            {require && !lname && <p className="text-red-500 mr-1 items-baseline">*</p>}
+
+            <label className="text-gray-700">Email</label>            
+            </div>
             <input
               className="input input-bordered w-full border border-gray-300 shadow p-1"
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
           <div className="flex flex-col gap-1">
+            <div className="flex flex-row justify-start"> 
+            {require && !lname && <p className="text-red-500 mr-1 items-baseline">*</p>}
             <label className="text-gray-700">Password</label>
+            </div>
             <input
               className="input input-bordered w-full border border-gray-300 shadow p-1"
-              type="passworda"
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

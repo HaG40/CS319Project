@@ -8,6 +8,7 @@ function Login() {
   const { login, isAuthenticated } = useUserStore();
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [require,setRequire] =React.useState(false)
 
   const [errorMessage, setErrorMessage] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -18,6 +19,7 @@ function Login() {
     setLoading(true);         
 
     if (!username || !password) {
+      setRequire(true)
       setErrorMessage("กรุณากรอกทั้งชื่อผู้ใช้และรหัสผ่าน");
       setLoading(false);
       return;
@@ -28,6 +30,7 @@ function Login() {
       if (!succes) {
         setErrorMessage("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
         setLoading(false);
+        setRequire(false)
         return;
       }
 
@@ -59,7 +62,10 @@ function Login() {
           <p className="text-2xl font-bold flex justify-center mb-2">Login</p>
 
           <div className="flex flex-col gap-1">
+            <div className="flex flex-row justify-start"> 
+            {require && !username && <p className="text-red-500 mr-1 items-baseline">*</p>}
             <label className="text-gray-700">Username</label>
+            </div>
             <input
               className="input input-bordered w-full border border-gray-300 shadow p-1"
               type="text"
@@ -69,7 +75,10 @@ function Login() {
           </div>
 
           <div className="flex flex-col gap-1">
+            <div className="flex flex-row justify-start"> 
+            {require && !password && <p className="text-red-500 mr-1 items-baseline">*</p>}
             <label className="text-gray-700">Password</label>
+            </div>
             <input
               className="input input-bordered w-full border border-gray-300 shadow p-1"
               type="password"

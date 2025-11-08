@@ -8,6 +8,7 @@ import { useActivityStore } from "../store/activityStore"
 import { useUserStore } from "../store/userStore"
 import axios from "axios"
 import Banner from "./Banner"
+import { toast } from 'react-toastify';
 
 function LandingPage () {
 
@@ -26,11 +27,26 @@ function LandingPage () {
 
     const submitApplication = async () => {
     if (!user) {
-        alert("กรุณาเข้าสู่ระบบก่อนสมัคร");
+        toast.warn("กรุณาเข้าสู่ระบบก่อนสมัคร");
         return;
     }
 
     try {
+        
+        if (!selectedActivity) {
+        toast.warn("ไม่มีข้อมูลกิจกรรม");
+        return;
+        } else if (!fullname || !email || !phone || !age) {
+        toast.warn("กรุณากรอกข้อมูลให้ครบถ้วน");
+        return;
+        }else if (isNaN(Number(age)) || Number(age) <= 0) {
+        toast.warn("กรุณากรอกอายุให้ถูกต้อง");
+        return;
+        }else if (selectedActivity.occupied >= selectedActivity.slots) {
+        toast.warn("กิจกรรมนี้เต็มแล้ว");
+        return;
+        }
+
         const res = await axios.post(
         `http://localhost:3000/api/act/join/${selectedActivity?.id}`,
         {
@@ -42,11 +58,13 @@ function LandingPage () {
         }
         );
 
-        alert("สมัครสำเร็จ");
+        toast.success("สมัครสำเร็จ");
         console.log(res.data);
+        if(category) await fetchByCategory(encodeURIComponent(category));
+        else await fetchAll();
         closeModal();
     } catch (err: any) {
-        alert(err.response?.data?.error || "เกิดข้อผิดพลาด");
+        toast.error(err.response?.data?.error || "เกิดข้อผิดพลาด");
     }
     };
 
@@ -93,7 +111,7 @@ function LandingPage () {
                         
                         {activity.image ? 
                         <img
-                            src={`http://localhost:3000${activity.image}`}
+                            src={activity.image ? `http://localhost:3000${activity.image}` : "https://via.placeholder.com/150"}
                             alt={activity.title}
                             className="w-full h-40 object-cover rounded-t-lg"
                         />
@@ -157,8 +175,8 @@ function LandingPage () {
                     </p>
 
                     <div className="flex flex-col gap-2.5 mb-5">
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="text" onChange={(e) => setFullname(e.target.value)} placeholder="ชื่อ - นามสกุล"/>
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="email" onChange={(e) => setEmail(e.target.value)} placeholder="อีเมล"/>
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="text" value={fullname} onChange={(e) => setFullname(e.target.value)} placeholder="ชื่อ - นามสกุล"/>
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="อีเมล"/>
                         <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="tel" onChange={(e) => setPhone(e.target.value)} placeholder="เบอร์โทรศัพท์"/>                    
                         <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="number" onChange={(e) => setAge(e.target.value)} placeholder="อายุ"/>                    
                     </div>

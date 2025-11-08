@@ -48,7 +48,7 @@ router.post("/join/:id", async (req: Request, res: Response) => {
     const existing = await prisma.activityRegistration.findUnique({
       where: { userId_activityId: { userId, activityId: id } }
     });
-    if (existing) return res.status(400).json({ error: "คุณลงทะเบียนแล้ว" });
+    if (existing) return res.status(400).json({ error: "คุณได้ลงทะเบียนกิจกรรมนี้ไปแล้ว" });
 
     const registration = await prisma.activityRegistration.create({
       data: {
@@ -107,6 +107,42 @@ router.post("/add", upload.single("image"), async (req: Request, res: Response) 
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
+});
+
+router.get("/registered/:id", async (req: Request, res: Response) => {
+  const { id } = req.params; 
+  try {
+    const registrations = await prisma.activityRegistration.findMany({
+      where: { userId: id },
+    });
+    const data = registrations;
+    const activityIds = registrations.map((reg) => reg.activityId);
+    const activities = await prisma.activity.findMany({
+      where: { id: { in: activityIds } },
+    });
+    res.json(activities);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.delete("/registered/cancel/:userId/:activityId", async (req: Request, res: Response) => {
+  const { userId, activityId } = req.params;
+  try {
+    await prisma.activityRegistration.delete({
+      where: 
+      { 
+        userId_activityId: { userId, activityId },
+      },
+    });
+    await prisma.activity.update({
+      where: { id: activityId },
+      data: { occupied: { decrement: 1 } },
+    });
+    res.json({ message: "ยกเลิกกิจกรรมสำเร็จ" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  } 
 });
 
 export default router;

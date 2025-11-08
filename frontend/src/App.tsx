@@ -5,6 +5,7 @@ import Header from './components/Header'
 import User from './components/User'
 import Login from './components/Login'
 import Register from './components/Register'
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
@@ -17,6 +18,14 @@ function App() {
       <Route path='/user/login' element={<Login/>}/>
       <Route path='/user/register' element={<Register/>}/>
     </Routes>
+    
+    <ToastContainer
+        position="bottom-center"
+        autoClose={2500}
+        closeOnClick
+        pauseOnHover
+        theme="light"
+      />
     </>
   )
 }
