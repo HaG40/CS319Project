@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import React from "react";
 import { useUserStore } from "../store/userStore";
@@ -37,6 +38,9 @@ function Login() {
 
       if (error.response?.data?.error) {
         setErrorMessage(error.response.data.error);
+      }else if (isAuthenticated) {
+        setErrorMessage("คุณได้เข้าสู่ระบบแล้ว");
+
       } else {
         setErrorMessage("เข้าสู่ระบบล้มเหลว กรุณาลองใหม่");
       }
@@ -47,10 +51,10 @@ function Login() {
 
   return (
     <>
-      <div className="mt-10 p-10 flex justify-center">
+      <div className="p-10 flex justify-center">
         <form
           onSubmit={handleSubmit}
-          className="mx-auto border border-gray-300 shadow rounded-2xl p-6 pb-10 flex flex-col justify-center gap-4 w-full max-w-sm"
+          className="mx-auto mt-20 border border-gray-300 shadow rounded-2xl p-6 pb-10 flex flex-col justify-center gap-4 w-full max-w-sm"
         >
           <p className="text-2xl font-bold flex justify-center mb-2">Login</p>
 

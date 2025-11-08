@@ -17,5 +17,7 @@ app.use(cookieParser());
 
 app.use("/api/user", userRouter);
 app.use("/api/act", activityRouter);
+app.use("/uploads", express.static("uploads"));
+
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));

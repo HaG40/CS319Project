@@ -33,7 +33,7 @@ export const useActivityStore = create<ActivityState>((set) => ({
   fetchByCategory: async (category: string) => {
     try {
       set({ isLoading: true, error: null });
-      const res = await axios.get(`http://localhost:3000/api/act/${category}`);
+      const res = await axios.get(`http://localhost:3000/api/act/category/${category}`);
       set({ activities: res.data });
     } catch (err) {
       set({ error: "โหลดข้อมูลล้มเหลว" });

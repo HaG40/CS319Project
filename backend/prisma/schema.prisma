@@ -29,16 +29,20 @@ model Activity {
   slots         Int
   occupied      Int
   organizer     String
+  image         String?
   createdAt     DateTime               @default(now())
   registrations ActivityRegistration[]
 }
 
 model ActivityRegistration {
-  user         Users    @relation(fields: [userId], references: [id])
-  userId       String
-  activity     Activity @relation(fields: [activityId], references: [id])
-  activityId   String
+  user   Users  @relation(fields: [userId], references: [id])
+  userId String
+
+  activity   Activity @relation(fields: [activityId], references: [id])
+  activityId String
+
   registeredAt DateTime @default(now())
+  participants Json? // ✅ เก็บข้อมูลแบบฟอร์มตอนสมัคร
 
   @@id([userId, activityId])
 }

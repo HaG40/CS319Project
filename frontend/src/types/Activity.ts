@@ -9,4 +9,5 @@ export interface Activity {
   slots: number;
   occupied?: number;
   organizer: string;
+  image?: string;
 }

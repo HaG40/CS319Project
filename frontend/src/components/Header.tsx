@@ -13,11 +13,11 @@ function Header () {
 
     return (
         <>
-            <div className="bg-emerald-400 flex flex-row justify-between">
+            <div className="fixed bg-emerald-400 flex flex-row justify-between w-screen h-16 shadow">
                 <div className="flex justify-start">
                     <p className="mx-5 text-white text-4xl font-bold p-4">VolunThai</p>
                 </div>
-                <div className="flex flex-row justify-end items-center gap-4 mx-5 text-white text-xl p-4 cursor-pointer font-semibold ">
+                <div className="flex flex-row justify-end items-center gap-4 mx-5 text-white text-lg p-4 cursor-pointer">
                     <Link to="/" className="hover:text-gray-200 hover:underline">Home</Link>
                     {isAuthenticated ? 
                     <>

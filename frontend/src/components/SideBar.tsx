@@ -1,28 +1,54 @@
 import { Link } from "react-router-dom"
 
 function SideBar() {
-
     return (
-        <div className="w-64 h-screen  bg-emerald-100">  
-            <h2 className="text-2xl font-bold text-emerald-700 items-center flex justify-center p-4 bg-yellow-100 shadow">หมวดหมู่</h2>
+        <div className="fixed top-0 left-0 h-screen w-50 mt-16 bg-emerald-100 shadow-lg overflow-y-auto z-50">  
+            <h2 className="text-2xl font-bold text-emerald-700 flex justify-center p-4 bg-yellow-100 shadow">
+                หมวดหมู่
+            </h2>
+
             <ul className="flex flex-col">
                 <li>  
-                    <Link to="/"  className="text-gray-500 hover:text-emerald-600 hover:underline text-lg p-4 shadow w-full flex hover:bg-amber-50">ทั้งหมด</Link>
+                    <Link to="/"  
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-50 block">
+                        ทั้งหมด
+                    </Link>
                 </li>
                 <li>  
-                    <Link to="/category/สิ่งแวดล้อม"  className="text-gray-500 hover:text-emerald-600 hover:underline text-lg p-4 shadow w-full flex hover:bg-amber-50">สิ่งแวดล้อม</Link>
+                    <Link to="/category/สิ่งแวดล้อม"  
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-50 block">
+                        สิ่งแวดล้อม
+                    </Link>
                 </li>
                 <li>
-                    <Link to="/category/การศึกษา" className="text-gray-500 hover:text-emerald-600 hover:underline text-lg p-4 shadow w-full flex hover:bg-amber-50">การศึกษา</Link>
+                    <Link to="/category/การศึกษา" 
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-50 block">
+                        การศึกษา
+                    </Link>
                 </li>
                 <li>
-                    <Link to="/category/สังคม" className="text-gray-500 hover:text-emerald-600 hover:underline text-lg p-4 shadow w-full flex hover:bg-amber-50">สังคม</Link>
+                    <Link to="/category/สังคม" 
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-50 block">
+                        สังคม
+                    </Link>
                 </li>
                 <li>
-                    <Link to="/category/สัตว์" className="text-gray-500 hover:text-emerald-600 hover:underline text-lg p-4 shadow w-full flex hover:bg-amber-50">การศึกษา</Link>
+                    <Link to="/category/สัตว์" 
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-50 block">
+                        สัตว์
+                    </Link>
                 </li>
                 <li>
-                    <Link to="/category/อื่นๆ" className="text-gray-500 hover:text-emerald-600 hover:underline text-lg p-4 shadow w-full flex hover:bg-amber-50">อื่นๆ</Link>
+                    <Link to="/category/ศิลปะ" 
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-50 block">
+                        ศิลปะ
+                    </Link>
+                </li>                
+                <li>
+                    <Link to="/category/อื่นๆ" 
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-50 block">
+                        อื่นๆ
+                    </Link>
                 </li>
             </ul>
         </div>

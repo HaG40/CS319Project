@@ -8,6 +8,7 @@ interface UserState {
   isAuthenticated: boolean;
 
   login: (username: string, password: string) => Promise<boolean>;
+  register: (username: string,fname: string,lname: string,email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -32,6 +33,23 @@ export const useUserStore = create<UserState>()(
             isAuthenticated: true,
           });
 
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      
+      register: async (username, fname, lname, email, password) => {
+        try {
+          const res = await axios.post(
+            "http://localhost:3000/api/user/register",
+            { username, fname, lname, email, password },
+            { withCredentials: true }
+          );
+          set({
+            user: res.data.user,
+            isAuthenticated: true,
+          });
           return true;
         } catch {
           return false;
