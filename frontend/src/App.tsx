@@ -11,6 +11,7 @@ import Footer from './components/Footer'
 import { useUserStore } from './store/userStore'
 import UserManager from './components/Administrator/UserManager'
 import CreateActivity from './components/Administrator/CreateActivity'
+import AdminLandingPage from './components/Administrator/AdminLandingPage'
 
 function App() {
   
@@ -21,7 +22,8 @@ function App() {
     <Header/>
     <div className='bg-amber-50 min-h-screen'>
       <Routes>
-        <Route path='/' element={<LandingPage/>}/>
+        {user?.role === "user" && <Route path='/' element={<LandingPage/>}/> }
+        {user?.role === "admin" && <Route path='/' element={<AdminLandingPage/>}/>}
         <Route path='/category/:category' element={<LandingPage/>}/>
         {user?.role === "user" && <Route path='/user' element={<User/>}/>}
         <Route path='/user/login' element={<Login/>}/>

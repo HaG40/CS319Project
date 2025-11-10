@@ -71,7 +71,7 @@ function UserManager() {
                 </thead>
 
                 <tbody>
-                    <tr className="border text-gray-800 text-shadow-sm bg-emerald-300">
+                    <tr className="border text-gray-800 bg-emerald-300">
                         <td className="p-3 border border-gray-400 shadow">
                             <p>{user?.username}</p>
                         </td>
@@ -88,15 +88,14 @@ function UserManager() {
                             <p>{user?.role}</p>
                         </td>
 
-                        <td className="p-3 border border-gray-400 bg-black shadow text-center text-green-500 font-extrabold">
-                            {user && user.username === "admin" && user.role === "admin" && <p>🟢 ONLINE</p>}
+                        <td className="p-3 border border-gray-400 shadow">
                         </td>
                     </tr>
 
                     {users.map((u: User) => (
                         <>
                             {u.role === "user" &&
-                                <tr key={u.id} className="border text-emerald-700 text-shadow-2xs hover:bg-amber-200 bg-amber-100 ">
+                                <tr key={u.id} className="border text-emerald-700 hover:bg-amber-200 bg-amber-100 ">
                                     <td className="p-3 border border-gray-400 shadow">
                                         {editingUser === u.id ? (
                                             <input
@@ -104,7 +103,7 @@ function UserManager() {
                                                 onChange={(e) =>
                                                     setForm({ ...form, username: e.target.value })
                                                 }
-                                                className="border p-1 rounded"
+                                                className="border p-1 rounded outline-0 shadow border-gray-300 bg-white"
                                             />
                                         ) : (
                                             u.username
@@ -113,13 +112,24 @@ function UserManager() {
 
                                     <td className="p-3 border border-gray-400 shadow">
                                         {editingUser === u.id ? (
+                                            <div className="flex flex-row gap-2">
                                             <input
                                                 value={form.fname}
                                                 onChange={(e) =>
                                                     setForm({ ...form, fname: e.target.value })
                                                 }
-                                                className="border p-1 rounded"
+                                                className="border p-1 rounded w-1/2 outline-0 shadow border-gray-300 bg-white"
                                             />
+                                                                                        <input
+                                                value={form.lname}
+                                                onChange={(e) =>
+                                                    setForm({ ...form, lname: e.target.value })
+                                                }
+                                                className="border p-1 rounded w-1/2 outline-0 shadow border-gray-300 bg-white"
+                                            />                                            
+                                            </div>
+
+                                            
                                         ) : (
                                             `${u.fname} ${u.lname}`
                                         )}
@@ -132,7 +142,7 @@ function UserManager() {
                                                 onChange={(e) =>
                                                     setForm({ ...form, email: e.target.value })
                                                 }
-                                                className="border p-1 rounded"
+                                                className="border p-1 rounded outline-0 shadow border-gray-300 bg-white"
                                             />
                                         ) : (
                                             u.email
@@ -146,7 +156,7 @@ function UserManager() {
                                                 onChange={(e) =>
                                                     setForm({ ...form, role: e.target.value })
                                                 }
-                                                className="border p-1 rounded"
+                                                className="border p-1 rounded outline-0 shadow border-gray-300 bg-white"
                                             >
                                                 <option value="user">user</option>
                                                 <option value="admin">admin(temp)</option>
