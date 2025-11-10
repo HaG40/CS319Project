@@ -4,7 +4,7 @@ import { FaHome, FaUser, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa'
 
 function Header () {
 
-    const { user, isAuthenticated,logout } = useUserStore();
+    const { isAuthenticated,logout } = useUserStore();
 
     const handleLogout = async () => {
         await logout();
@@ -29,8 +29,6 @@ function Header () {
                     :        
                         <Link to="/user/login" className="hover:text-emerald-400 hover:underline rounded-full p-3 text-xl shadow bg-emerald-600 hover:bg-amber-50"><FaSignInAlt/></Link>
                     }
-
-
                 </div>
             </div>
         </>

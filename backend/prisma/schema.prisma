@@ -42,7 +42,7 @@ model ActivityRegistration {
   activityId String
 
   registeredAt DateTime @default(now())
-  participants Json? // ✅ เก็บข้อมูลแบบฟอร์มตอนสมัคร
+  participants Json?
 
   @@id([userId, activityId])
 }

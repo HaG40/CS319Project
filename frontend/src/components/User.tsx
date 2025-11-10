@@ -9,7 +9,6 @@ function User () {
     const { user } = useUserStore();
     const { registeredActivities, getRegisteredActivity, cancelRegistration } = useActivityStore();
 
-    // ✅ Popup Modal State
     const [isCancelOpen, setIsCancelOpen] = React.useState(false);
     const [selectedActivityId, setSelectedActivityId] = React.useState<string | null>(null);
 
@@ -43,15 +42,22 @@ function User () {
 
     return (
         <>
-            <div className="pt-25 flex flex-col justify-center mb-16 w-full items-center">
-                <h1 className="text-3xl font-bold">กิจกรรมที่คุณลงทะเบียน</h1>
-                <div className="mt-10 w-full max-w-4xl">
+            <div className="pt-25 flex flex-row justify-center gap-6 mb-16 w-full">
+                <div className="border border-gray-300 rounded-2xl shadow p-4 flex flex-col justify-start h-full bg-emerald-50">
+                    <p className="text-xl mb-2 font-semibold text-emerald-800">Profile</p>
+                    <p className="text-gray-600"><b className="text-emerald-800 font-semibold">username:</b> {user?.username}</p>
+                    <p className="text-gray-600"><b className="text-emerald-800 font-semibold">ชื่อ:</b> {user?.fname} {user?.lname}</p>
+                    <p className="text-gray-600"><b className="text-emerald-800 font-semibold">email:</b> {user?.email}</p>
+                </div>
+                <div className="w-2/3 border border-gray-300 shadow rounded-2xl bg-emerald-50 p-4">
+                <h1 className="text-xl text-emerald-800 font-bold">กิจกรรมที่คุณลงทะเบียน</h1>
+                <div className="mt-2 w-full max-w-4xl">
                     {registeredActivities.length === 0 ? (
                         <p className="text-center text-gray-500">คุณยังไม่ได้ลงทะเบียนเข้าร่วมกิจกรรมใดๆ</p>
                     ) : (
                         <ul className="space-y-4">
                             {registeredActivities.map((activity) => (
-                                <li key={activity.id} className="border mx-auto justify-between flex flex-row gap-6 border-gray-300 rounded-lg p-4 shadow">
+                                <li key={activity.id} className=" mx-auto justify-between flex flex-row gap-6 border border-gray-300 shadow rounded-2xl bg-white p-4">
                                     <div className="flex flex-row justify-start gap-8">
                                         <img
                                             src={activity.image ? `http://localhost:3000${activity.image}` : 'https://via.placeholder.com/150'}
@@ -79,6 +85,7 @@ function User () {
                             ))}
                         </ul>
                     )}
+                </div>
                 </div>
             </div>
 

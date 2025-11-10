@@ -38,13 +38,11 @@ router.get("/category/:category", async (req, res) => {
   res.status(200).json(activities);
 });
 
-// ✅ สมัครเข้าร่วมกิจกรรม
 router.post("/join/:id", async (req: Request, res: Response) => {
-  const { id } = req.params; // activityId
-  const { userId, fullname, email, phone, age } = req.body;
+  const { id } = req.params;
+  const { userId, fullname, email, phone, line, age } = req.body;
 
   try {
-    // ตรวจสอบว่าผู้ใช้ลงทะเบียนแล้วหรือยัง
     const existing = await prisma.activityRegistration.findUnique({
       where: { userId_activityId: { userId, activityId: id } }
     });
@@ -54,11 +52,10 @@ router.post("/join/:id", async (req: Request, res: Response) => {
       data: {
         userId,
         activityId: id,
-        participants: { fullname, email, phone, age },
+        participants: { fullname, email, phone, line, age },
       },
     });
 
-    // เพิ่มจำนวน occupied
     await prisma.activity.update({
       where: { id },
       data: { occupied: { increment: 1 } },
@@ -110,21 +107,63 @@ router.post("/add", upload.single("image"), async (req: Request, res: Response) 
 });
 
 router.get("/registered/:id", async (req: Request, res: Response) => {
-  const { id } = req.params; 
+  const { id } = req.params;
   try {
     const registrations = await prisma.activityRegistration.findMany({
       where: { userId: id },
+      orderBy: { registeredAt: "desc" },
     });
-    const data = registrations;
     const activityIds = registrations.map((reg) => reg.activityId);
     const activities = await prisma.activity.findMany({
       where: { id: { in: activityIds } },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
     res.json(activities);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+router.get("/search", async (req: Request, res: Response) => {
+  try {
+    const keyword = req.query.q as string;
+    let activities = null
+      if (!keyword || keyword.trim() === "") {
+        activities = await prisma.activity.findMany({
+        where: {
+          title: {
+            mode: "insensitive",
+          },
+        },
+        orderBy:{
+          createdAt: "desc"
+        }
+      });
+    } else {
+      activities = await prisma.activity.findMany({
+        where: {
+          title: {
+            contains: keyword,
+            mode: "insensitive",
+          },
+        },
+        orderBy:{
+          createdAt: "desc"
+        }
+      });
+    }
+
+    res.json(activities);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 router.delete("/registered/cancel/:userId/:activityId", async (req: Request, res: Response) => {
   const { userId, activityId } = req.params;

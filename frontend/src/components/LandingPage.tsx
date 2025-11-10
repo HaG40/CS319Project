@@ -9,6 +9,7 @@ import { useUserStore } from "../store/userStore"
 import axios from "axios"
 import Banner from "./Banner"
 import { toast } from 'react-toastify';
+import { FaSearch } from "react-icons/fa"
 
 function LandingPage () {
 
@@ -17,33 +18,34 @@ function LandingPage () {
     const [selectedActivity, setSelectedActivity] = React.useState<Activity | null>(null);
 
     const { category } = useParams<{ category: string }>();
-    const { activities, isLoading, fetchAll, fetchByCategory } = useActivityStore();
+    const { activities, isLoading, fetchAll, fetchByCategory, searchActivity } = useActivityStore();
 
     const user = useUserStore((state) => state.user);
-    const [fullname, setFullname] = React.useState("");
-    const [email, setEmail] = React.useState("");
+    const [fullname, setFullname] = React.useState(`${user?.fname} ${user?.lname}`);
+    const [email, setEmail] = React.useState(`${user?.email}`);
     const [phone, setPhone] = React.useState("");
+    const [line, setLine] = React.useState("")
     const [age, setAge] = React.useState("");
 
-    const submitApplication = async () => {
-    if (!user) {
-        toast.warn("กรุณาเข้าสู่ระบบก่อนสมัคร");
-        return;
-    }
+    const [search, setSearch] = React.useState("");
 
+    const submitApplication = async () => {
     try {
         
         if (!selectedActivity) {
-        toast.warn("ไม่มีข้อมูลกิจกรรม");
+            toast.warn("ไม่มีข้อมูลกิจกรรม");
         return;
         } else if (!fullname || !email || !phone || !age) {
-        toast.warn("กรุณากรอกข้อมูลให้ครบถ้วน");
+            toast.warn("กรุณากรอกข้อมูลให้ครบถ้วน");
         return;
         }else if (isNaN(Number(age)) || Number(age) <= 0) {
-        toast.warn("กรุณากรอกอายุให้ถูกต้อง");
+            toast.warn("กรุณากรอกอายุให้ถูกต้อง");
         return;
+        }else if(Number(age) < 15) {
+            toast.warn("คุณต้องมีอายุ 15 ปีขึ้นไป");
+            return;
         }else if (selectedActivity.occupied >= selectedActivity.slots) {
-        toast.warn("กิจกรรมนี้เต็มแล้ว");
+            toast.warn("กิจกรรมนี้เต็มแล้ว");
         return;
         }
 
@@ -54,6 +56,7 @@ function LandingPage () {
             fullname,
             email,
             phone,
+            line,
             age,
         }
         );
@@ -81,6 +84,10 @@ function LandingPage () {
 
 
     const openModal = (activity: Activity) => {
+        if (!user) {
+            toast.warn("กรุณาเข้าสู่ระบบก่อนสมัคร");
+            return;
+        }
         setSelectedActivity(activity);
         setIsOpen(true);
     };
@@ -96,13 +103,27 @@ function LandingPage () {
             <SideBar/>
             <div className="mt-16 mb-16 flex flex-col w-full">
                 <span className="ml-50"><Banner/></span>
-                
                 <div className="ml-52 mr-8 flex flex-col ">
                 <h1 className="text-3xl font-semibold mx-auto my-5 text-emerald-600">
                     {category ? `กิจกรรมหมวด: ${category}` : "กิจกรรมทั้งหมด"}
                 </h1>
 
+                <div className="flex flex-row justify-between mx-auto w-1/2 mb-5 items-center border px-3 py-1  shadow rounded-xl border-gray-300">
+                    <input
+                        type="text"
+                        className="w-full outline-0"
+                        value={search}
+                        placeholder="ค้นหากิจกรรมที่คุณสนใจ..."
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            searchActivity(e.target.value);
+                        }}
+                    />
+                    <FaSearch className="items-center text-gray-400"/>
+                </div>
+
                 {isLoading && <p className="text-gray-500 mx-auto">กำลังโหลด...</p>}
+                {!isLoading && activities.length < 1 && <p className="text-gray-500 mx-auto">ไม่พบข้อมูล</p>}
 
 
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-5 w-full">
@@ -177,8 +198,10 @@ function LandingPage () {
                     <div className="flex flex-col gap-2.5 mb-5">
                         <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="text" value={fullname} onChange={(e) => setFullname(e.target.value)} placeholder="ชื่อ - นามสกุล"/>
                         <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="อีเมล"/>
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="tel" onChange={(e) => setPhone(e.target.value)} placeholder="เบอร์โทรศัพท์"/>                    
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="number" onChange={(e) => setAge(e.target.value)} placeholder="อายุ"/>                    
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="tel" onChange={(e) => setPhone(e.target.value)} placeholder="เบอร์โทรศัพท์"/>              
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="line" onChange={(e) => setLine(e.target.value)} placeholder="ไอดี Line"/>                     
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="number" onChange={(e) => setAge(e.target.value)} placeholder="อายุ"/> 
+                        <p className="text-xs text-gray-500">*** ข้อมูลติดต่อเหล่านี้ไว้สำหรับการติดต่อผู้สมัครเข้าร่วม</p>                   
                     </div>
 
                     <div className="flex justify-between mt-4">
@@ -191,7 +214,7 @@ function LandingPage () {
                     <button 
                         onClick={submitApplication}
                         className="btn bg-emerald-500 text-white p-1.5 rounded cursor-pointer">
-                        ส่งใบสมัคร
+                        เข้าร่วม
                     </button>
 
                     </div>
