@@ -22,6 +22,7 @@ CREATE TABLE "Activity" (
     "slots" INTEGER NOT NULL,
     "occupied" INTEGER NOT NULL,
     "organizer" TEXT NOT NULL,
+    "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Activity_pkey" PRIMARY KEY ("id")
@@ -32,6 +33,7 @@ CREATE TABLE "ActivityRegistration" (
     "userId" TEXT NOT NULL,
     "activityId" TEXT NOT NULL,
     "registeredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "participants" JSONB,
 
     CONSTRAINT "ActivityRegistration_pkey" PRIMARY KEY ("userId","activityId")
 );
