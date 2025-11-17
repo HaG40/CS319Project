@@ -15,12 +15,24 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMessage("");     
-    setLoading(true);         
+    setErrorMessage("");
+    setLoading(true);
 
     if (!username || !password) {
-      setRequire(true)
+      setRequire(true);
       setErrorMessage("กรุณากรอกทั้งชื่อผู้ใช้และรหัสผ่าน");
+      setLoading(false);
+      return;
+    }
+
+    if (/\s/.test(username)) {
+      setErrorMessage("ชื่อผู้ใช้ห้ามมีช่องว่าง");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
       setLoading(false);
       return;
     }
@@ -30,20 +42,18 @@ function Login() {
       if (!succes) {
         setErrorMessage("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
         setLoading(false);
-        setRequire(false)
+        setRequire(false);
         return;
       }
 
-      if(succes) window.location.replace("/");
-
+      if (succes) window.location.replace("/");
     } catch (error: any) {
       console.error("Login failed:", error);
 
       if (error.response?.data?.error) {
         setErrorMessage(error.response.data.error);
-      }else if (isAuthenticated) {
+      } else if (isAuthenticated) {
         setErrorMessage("คุณได้เข้าสู่ระบบแล้ว");
-
       } else {
         setErrorMessage("เข้าสู่ระบบล้มเหลว กรุณาลองใหม่");
       }
@@ -52,22 +62,23 @@ function Login() {
     }
   };
 
+
   return (
     <>
       <div className="p-10 flex justify-center">
         <form
           onSubmit={handleSubmit}
-          className="mx-auto mt-20 border border-gray-300 shadow rounded-2xl p-6 pb-10 flex flex-col justify-center gap-4 w-full max-w-sm"
+          className="mx-auto min-w-1/4 mt-20 border border-gray-300 shadow rounded-2xl p-6 pb-10 flex flex-col justify-center gap-4 w-full max-w-sm bg-white"
         >
-          <p className="text-2xl font-bold flex justify-center mb-2">Login</p>
+          <p className="text-2xl font-bold flex justify-center mb-2 text-emerald-700">LOGIN</p>
 
           <div className="flex flex-col gap-1">
             <div className="flex flex-row justify-start"> 
             {require && !username && <p className="text-red-500 mr-1 items-baseline">*</p>}
-            <label className="text-gray-700">Username</label>
+            <label className="text-gray-700">Username:</label>
             </div>
             <input
-              className="input input-bordered w-full border border-gray-300 shadow p-1"
+              className="input input-bordered w-full border border-gray-300 shadow p-2 rounded-lg outline-0"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -77,10 +88,10 @@ function Login() {
           <div className="flex flex-col gap-1">
             <div className="flex flex-row justify-start"> 
             {require && !password && <p className="text-red-500 mr-1 items-baseline">*</p>}
-            <label className="text-gray-700">Password</label>
+            <label className="text-gray-700">Password:</label>
             </div>
             <input
-              className="input input-bordered w-full border border-gray-300 shadow p-1"
+              className="input input-bordered w-full border border-gray-300 shadow p-2 rounded-lg outline-0"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -94,7 +105,7 @@ function Login() {
           )}
 
           <button
-            className={`btn bg-emerald-500 text-white w-full mt-4 cursor-pointer p-1.5 ${
+            className={`rounded-lg shadow btn bg-emerald-500 text-white w-full mt-4 cursor-pointer p-2 ${
               loading ? "btn-disabled opacity-60" : ""
             }`}
             type="submit"
@@ -106,7 +117,7 @@ function Login() {
             to="/user/register"
             className="flex justify-center text-blue-600 hover:underline mt-2"
           >
-            ยังไม่มีบัญชี ?
+            ยังไม่มีบัญชี?
           </Link>
         </form>
       </div>

@@ -13,6 +13,7 @@ interface ActivityState {
   fetchByCategory: (category: string) => Promise<void>;
   getRegisteredActivity: (userId: string) => Promise<Activity[]>;
   cancelRegistration: (userId: string, activityId: string) => Promise<boolean>;
+  searchActivity: (keyword: string) => Promise<void>;
 }
 
 export const useActivityStore = create<ActivityState>((set) => ({
@@ -69,6 +70,17 @@ export const useActivityStore = create<ActivityState>((set) => ({
     } catch (err) {
       set({ error: "ยกเลิกการสมัครล้มเหลว" });
       return false;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  searchActivity: async (keyword: string) => {
+    set({ isLoading: true });
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/api/act/search?q=${keyword}`
+      );
+      set({ activities: res.data });
     } finally {
       set({ isLoading: false });
     }

@@ -27,6 +27,12 @@ function SideBar() {
                     </Link>
                 </li>
                 <li>
+                    <Link to="/category/สุขภาพ" 
+                          className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-100 block">
+                        สุขภาพ
+                    </Link>
+                </li>
+                <li>
                     <Link to="/category/สังคม" 
                           className=" shadow-sm text-gray-600 hover:text-emerald-600 hover:underline text-lg p-4 hover:bg-amber-100 block">
                         สังคม

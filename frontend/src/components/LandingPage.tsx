@@ -9,6 +9,7 @@ import { useUserStore } from "../store/userStore"
 import axios from "axios"
 import Banner from "./Banner"
 import { toast } from 'react-toastify';
+import { FaSearch } from "react-icons/fa"
 
 function LandingPage () {
 
@@ -17,43 +18,56 @@ function LandingPage () {
     const [selectedActivity, setSelectedActivity] = React.useState<Activity | null>(null);
 
     const { category } = useParams<{ category: string }>();
-    const { activities, isLoading, fetchAll, fetchByCategory } = useActivityStore();
+    const { activities, isLoading, fetchAll, fetchByCategory, searchActivity } = useActivityStore();
 
     const user = useUserStore((state) => state.user);
-    const [fullname, setFullname] = React.useState("");
-    const [email, setEmail] = React.useState("");
+    const [fullname, setFullname] = React.useState(`${user?.fname} ${user?.lname}`);
+    const [email, setEmail] = React.useState(`${user?.email}`);
     const [phone, setPhone] = React.useState("");
+    const [line, setLine] = React.useState("")
     const [age, setAge] = React.useState("");
 
-    const submitApplication = async () => {
-    if (!user) {
-        toast.warn("กรุณาเข้าสู่ระบบก่อนสมัคร");
-        return;
-    }
+    const [search, setSearch] = React.useState("");
 
+    const submitApplication = async () => {
     try {
         
-        if (!selectedActivity) {
+    if (!selectedActivity) {
         toast.warn("ไม่มีข้อมูลกิจกรรม");
         return;
-        } else if (!fullname || !email || !phone || !age) {
+    } else if (!fullname || !email || !phone || !line || !age) {
         toast.warn("กรุณากรอกข้อมูลให้ครบถ้วน");
         return;
-        }else if (isNaN(Number(age)) || Number(age) <= 0) {
+    } else if (isNaN(Number(age)) || Number(age) <= 0) {
         toast.warn("กรุณากรอกอายุให้ถูกต้อง");
         return;
-        }else if (selectedActivity.occupied >= selectedActivity.slots) {
+    } else if (Number(age) < 15) {
+        toast.warn("คุณต้องมีอายุ 15 ปีขึ้นไป");
+        return;
+    } 
+    // ตรวจสอบอีเมล
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast.warn("รูปแบบอีเมลไม่ถูกต้อง");
+        return;
+    }
+    // ตรวจสอบเบอร์มือถือไทย 10 หลัก
+    else if (!/^0[0-9]{9}$/.test(phone)) {
+        toast.warn("กรุณากรอกเบอร์มือถือ 10 หลักที่ถูกต้อง");
+        return;
+    }
+    else if ((selectedActivity?.occupied ?? 0) >= (selectedActivity?.slots ?? 0)) {
         toast.warn("กิจกรรมนี้เต็มแล้ว");
         return;
-        }
+    }
 
         const res = await axios.post(
         `http://localhost:3000/api/act/join/${selectedActivity?.id}`,
         {
-            userId: user.id,
+            userId: user?.id,
             fullname,
             email,
             phone,
+            line,
             age,
         }
         );
@@ -81,6 +95,10 @@ function LandingPage () {
 
 
     const openModal = (activity: Activity) => {
+        if (!user) {
+            toast.warn("กรุณาเข้าสู่ระบบก่อนสมัคร");
+            return;
+        }
         setSelectedActivity(activity);
         setIsOpen(true);
     };
@@ -94,15 +112,29 @@ function LandingPage () {
         <>
         <div className="flex flex-row justify-between">
             <SideBar/>
-            <div className="mt-16 mb-16 flex flex-col w-full">
+            <div className="mt-16 mb-16 flex flex-col w-full ">
                 <span className="ml-50"><Banner/></span>
-                
                 <div className="ml-52 mr-8 flex flex-col ">
                 <h1 className="text-3xl font-semibold mx-auto my-5 text-emerald-600">
                     {category ? `กิจกรรมหมวด: ${category}` : "กิจกรรมทั้งหมด"}
                 </h1>
 
-                {isLoading && <p className="text-gray-500 mx-auto">กำลังโหลด...</p>}
+                <div className="flex flex-row justify-between mx-auto w-1/2 mb-5 items-center border px-3 py-2  shadow-lg rounded-xl border-gray-300 bg-white">
+                    <input
+                        type="text"
+                        className="w-full outline-0"
+                        value={search}
+                        placeholder="ค้นหากิจกรรมที่คุณสนใจ..."
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            searchActivity(e.target.value);
+                        }}
+                    />
+                    <FaSearch className="items-center text-gray-400"/>
+                </div>
+
+                {isLoading && <p className="text-gray-500 mx-auto mt-5">กำลังโหลด...</p>}
+                {!isLoading && activities.length < 1 && <p className="text-gray-500 mx-auto mt-5">ไม่พบข้อมูล</p>}
 
 
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-5 w-full">
@@ -113,14 +145,14 @@ function LandingPage () {
                         <img
                             src={activity.image ? `http://localhost:3000${activity.image}` : "https://via.placeholder.com/150"}
                             alt={activity.title}
-                            className="w-full h-40 object-cover rounded-t-lg"
+                            className="w-full h-65 object-cover rounded-t-lg"
                         />
                         :
-                        <div className="w-full h-40 bg-gray-200 flex justify-center items-center rounded-t-lg">
+                        <div className="w-full h-65 bg-gray-200 flex justify-center items-center rounded-t-lg">
                             <span className="text-gray-500">ไม่มีรูปภาพ</span>
                         </div>
                         }
-                    <div className=" border-b h-60 rounded-b-2xl px-4 pb-4 pt-2 flex flex-col shadow border-gray-200">
+                    <div className=" border-b h-60 rounded-b-2xl px-4 pb-4 pt-2 flex flex-col shadow-lg border-gray-200 bg-white">
 
                         <h2 className="font-semibold text-lg text-emerald-600 mb-1">{activity.title}</h2>
 
@@ -175,10 +207,12 @@ function LandingPage () {
                     </p>
 
                     <div className="flex flex-col gap-2.5 mb-5">
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="text" value={fullname} onChange={(e) => setFullname(e.target.value)} placeholder="ชื่อ - นามสกุล"/>
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="อีเมล"/>
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="tel" onChange={(e) => setPhone(e.target.value)} placeholder="เบอร์โทรศัพท์"/>                    
-                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded" type="number" onChange={(e) => setAge(e.target.value)} placeholder="อายุ"/>                    
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded-lg outline-0" type="text" value={fullname} onChange={(e) => setFullname(e.target.value)} placeholder="ชื่อ - นามสกุล"/>
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded-lg outline-0" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="อีเมล"/>
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded-lg outline-0" type="tel" onChange={(e) => setPhone(e.target.value)} placeholder="เบอร์โทรศัพท์"/>              
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded-lg outline-0" type="line" onChange={(e) => setLine(e.target.value)} placeholder="ไอดี Line"/>                     
+                        <input className="input input-bordered px-2 w-full border boreder-gray-300 shadow p-1 rounded-lg outline-0" type="number" onChange={(e) => setAge(e.target.value)} placeholder="อายุ"/> 
+                        <p className="text-xs text-gray-500">*** ข้อมูลติดต่อเหล่านี้ไว้สำหรับการติดต่อผู้สมัครเข้าร่วม</p>                   
                     </div>
 
                     <div className="flex justify-between mt-4">
@@ -191,7 +225,7 @@ function LandingPage () {
                     <button 
                         onClick={submitApplication}
                         className="btn bg-emerald-500 text-white p-1.5 rounded cursor-pointer">
-                        ส่งใบสมัคร
+                        เข้าร่วม
                     </button>
 
                     </div>

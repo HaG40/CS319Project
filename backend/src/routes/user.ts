@@ -12,7 +12,7 @@ interface TokenPayload {
   email: string;
 }
 
-// ✅ MIDDLEWARE ตรวจ TOKEN
+// Middleware ตรวจสอบ Token
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies?.token;
 
@@ -22,12 +22,12 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
     (req as any).user = decoded;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: "Token invalid or expired" });
   }
 };
 
-// ✅ REGISTER
+// REGISTER
 router.post("/register", async (req, res) => {
   try {
     const { username, fname, lname, email, password } = req.body;
@@ -48,7 +48,14 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await hash(password, salt);
 
     const user = await prisma.users.create({
-      data: { username, fname, lname, email, password: hashedPassword },
+      data: {
+        username,
+        fname,
+        lname,
+        email,
+        role: "user",
+        password: hashedPassword,
+      },
     });
 
     res.json({ message: "Registered", user });
@@ -57,7 +64,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ✅ LOGIN
+// LOGIN
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -86,14 +93,61 @@ router.post("/login", async (req, res) => {
       fname: user.fname,
       lname: user.lname,
       email: user.email,
+      role: user.role,
     },
   });
 });
 
-// ✅ LOGOUT
+// LOGOUT
 router.post("/logout", (req, res) => {
   res.clearCookie("token");
   res.json({ message: "Logged out" });
+});
+
+router.get("/all", async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.users.findMany({
+      select: {
+        id: true,
+        username: true,
+        fname: true,
+        lname: true,
+        email: true,
+        role: true,
+        registrations: true,
+      },
+    });
+
+    res.json({ users });
+  } catch {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.put("/edit/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { username, fname, lname, email, role } = req.body;
+
+  try {
+    const updated = await prisma.users.update({
+      where: { id },
+      data: { username, fname, lname, email, role },
+    });
+
+    res.json({ message: "Updated", user: updated });
+  } catch {
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+router.delete("/delete/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await prisma.users.delete({ where: { id } });
+    res.json({ message: "Deleted User" });
+  } catch {
+    res.status(500).json({ error: "Delete failed" });
+  }
 });
 
 export default router;
