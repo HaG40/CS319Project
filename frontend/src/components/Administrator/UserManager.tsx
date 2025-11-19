@@ -98,8 +98,7 @@ function UserManager() {
             <td className="p-3 border border-gray-400 shadow">
               <p>{user?.role}</p>
             </td>
-            <td className="p-3 border border-gray-400 bg-black shadow text-center text-green-500 font-extrabold">
-              {user && user.username === "admin" && user.role === "admin" && <p>🟢 ONLINE</p>}
+            <td className="p-3 border border-gray-400 bg-amber-100 shadow">
             </td>
           </tr>
 
@@ -115,13 +114,21 @@ function UserManager() {
                   />
                 ) : u.username}
               </td>
-              <td className="p-3 border border-gray-400 shadow">
+              <td className="p-3 border border-gray-400 shadow outline-0">
                 {editingUser === u.id ? (
-                  <input
-                    value={form.fname}
-                    onChange={(e) => setForm({ ...form, fname: e.target.value })}
-                    className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0"
-                  />
+                  <div className="flex flex-row gap-2">
+                    <input
+                      value={form.fname}
+                      onChange={(e) => setForm({ ...form, fname: e.target.value })}
+                      className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-1/2"
+                    />
+                    <input
+                      value={form.fname}
+                      onChange={(e) => setForm({ ...form, fname: e.target.value })}
+                      className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-1/2"
+                    />
+                  </div>
+
                 ) : `${u.fname} ${u.lname}`}
               </td>
               <td className="p-3 border border-gray-400 shadow">
