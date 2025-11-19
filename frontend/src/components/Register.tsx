@@ -162,7 +162,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           )}
 
           <button
-            className={`rounded-lg  shadow btn bg-emerald-500 text-white w-full mt-4 cursor-pointer p-2 ${
+            className={`rounded-lg  shadow btn bg-emerald-500 hover:bg-emerald-700 text-white w-full mt-4 cursor-pointer p-2 ${
               loading ? "btn-disabled opacity-60" : ""
             }`}
             type="submit"
