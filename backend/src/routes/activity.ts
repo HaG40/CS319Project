@@ -20,7 +20,9 @@ const upload = multer({ storage });
 
 router.get("/", async (_req, res) => {
   try {
-    const activities = await prisma.activity.findMany();
+    const activities = await prisma.activity.findMany({
+      orderBy: { createdAt: "desc" },
+    });
     res.json(activities);
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
@@ -32,6 +34,7 @@ router.get("/category/:category", async (req, res) => {
 
   const activities = await prisma.activity.findMany({
     where: { category: { equals: category, mode: "insensitive" } },
+    orderBy: { createdAt: "desc" },
   });
 
   res.status(200).json(activities);

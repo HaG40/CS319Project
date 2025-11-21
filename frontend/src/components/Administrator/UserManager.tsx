@@ -5,73 +5,87 @@ import { useUserStore } from "../../store/userStore";
 import axios from "axios";
 
 function UserManager() {
-    const { user } = useUserStore();
-    const [users, setUsers] = useState([]);
-    const [editingUser, setEditingUser] = useState("");
-    const [form, setForm] = useState({
-        username: "",
-        fname: "",
-        lname: "",
-        email: "",
-        role: "",
+  const { user } = useUserStore();
+  const [users, setUsers] = useState<User[]>([]);
+  const [editingUser, setEditingUser] = useState("");
+  const [form, setForm] = useState({
+    username: "",
+    fname: "",
+    lname: "",
+    email: "",
+    role: "",
+  });
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+
+  const fetchUsers = async () => {
+    const res = await axios.get("http://localhost:3000/api/user/all");
+    setUsers(res.data.users);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const startEdit = (user: User) => {
+    setEditingUser(user.id);
+    setForm({
+      username: user.username,
+      fname: user.fname,
+      lname: user.lname,
+      email: user.email,
+      role: user.role,
     });
+  };
 
-    const fetchUsers = async () => {
-        const res = await axios.get("http://localhost:3000/api/user/all");
-        setUsers(res.data.users);
-    };
+  const cancelEdit = () => {
+    setEditingUser("");
+  };
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+  const saveUser = async (id: string) => {
+    await axios.put(`http://localhost:3000/api/user/edit/${id}`, form);
+    setEditingUser("");
+    fetchUsers();
+  };
 
-    const startEdit = (user: User) => {
-        setEditingUser(user.id);
-        setForm({
-            username: user.username,
-            fname: user.fname,
-            lname: user.lname,
-            email: user.email,
-            role: user.role,
-        });
-    };
+  // แทน confirm() ด้วย modal
+  const openDeleteModal = (id: string) => {
+    setDeleteUserId(id);
+    setIsDeleteOpen(true);
+  };
 
-    const cancelEdit = () => {
-        setEditingUser("");
-    };
+  const closeDeleteModal = () => {
+    setDeleteUserId(null);
+    setIsDeleteOpen(false);
+  };
 
-    const saveUser = async (id: string) => {
-        await axios.put(`http://localhost:3000/api/user/edit/${id}`, form);
-        setEditingUser("");
-        fetchUsers();
-    };
+  const confirmDelete = async () => {
+    if (!deleteUserId) return;
+    await axios.delete(`http://localhost:3000/api/user/delete/${deleteUserId}`);
+    closeDeleteModal();
+    fetchUsers();
+  };
 
-    const deleteUser = async (id: string) => {
-        if (!confirm("ต้องการลบผู้ใช้นี้หรือไม่?")) return;
+  return (
+    <div className="p-10">
+      <h1 className="text-3xl font-bold mb-6 text-emerald-700 mt-15">
+        User Manager For Administrator
+      </h1>
 
-        await axios.delete(`http://localhost:3000/api/user/delete/${id}`);
-        fetchUsers();
-    };
-
-    return (
-        <div className="p-10">
-            <h1 className="text-3xl font-bold mb-6 text-emerald-700 mt-15">
-                User Manager For Administrator
-            </h1>
-
-            <table className="w-full border border-gray-400 shadow rounded-lg">
-                <thead className="bg-emerald-100 ">
-                    <tr>
-                        <th className="p-3 border-x text-white bg-emerald-700">Username</th>
-                        <th className="p-3 border-x text-white bg-emerald-700">ชื่อ</th>
-                        <th className="p-3 border-x text-white bg-emerald-700">Email</th>
-                        <th className="p-3 border-x text-white bg-emerald-700">Role</th>
-                        <th className="p-3 border-x text-white bg-emerald-700 w-40">Actions</th>
-                    </tr>
-                </thead>
+      <table className="w-full border border-gray-400 shadow rounded-lg">
+        <thead className="bg-emerald-100 ">
+          <tr>
+            <th className="p-3 border-x text-white bg-emerald-700">Username</th>
+            <th className="p-3 border-x text-white bg-emerald-700">ชื่อ</th>
+            <th className="p-3 border-x text-white bg-emerald-700">Email</th>
+            <th className="p-3 border-x text-white bg-emerald-700">Role</th>
+            <th className="p-3 border-x text-white bg-emerald-700 w-40">Actions</th>
+          </tr>
+        </thead>
 
                 <tbody>
-                    <tr className="border text-gray-800 bg-emerald-300">
+                    <tr className="border text-gray-800 text-shadow-sm bg-emerald-300">
                         <td className="p-3 border border-gray-400 shadow">
                             <p>{user?.username}</p>
                         </td>
@@ -88,14 +102,15 @@ function UserManager() {
                             <p>{user?.role}</p>
                         </td>
 
-                        <td className="p-3 border border-gray-400 shadow">
+                        <td className="p-3 border border-gray-400 bg-black shadow text-center text-green-500 font-extrabold">
+                            {user && user.username === "admin" && user.role === "admin" && <p>🟢 ONLINE</p>}
                         </td>
                     </tr>
 
                     {users.map((u: User) => (
                         <>
                             {u.role === "user" &&
-                                <tr key={u.id} className="border text-emerald-700 hover:bg-amber-200 bg-amber-100 ">
+                                <tr key={u.id} className="border text-emerald-700 text-shadow-2xs hover:bg-amber-200 bg-amber-100 ">
                                     <td className="p-3 border border-gray-400 shadow">
                                         {editingUser === u.id ? (
                                             <input
@@ -103,7 +118,7 @@ function UserManager() {
                                                 onChange={(e) =>
                                                     setForm({ ...form, username: e.target.value })
                                                 }
-                                                className="border p-1 rounded outline-0 shadow border-gray-300 bg-white"
+                                                className="border p-1 rounded"
                                             />
                                         ) : (
                                             u.username
@@ -112,24 +127,13 @@ function UserManager() {
 
                                     <td className="p-3 border border-gray-400 shadow">
                                         {editingUser === u.id ? (
-                                            <div className="flex flex-row gap-2">
                                             <input
                                                 value={form.fname}
                                                 onChange={(e) =>
                                                     setForm({ ...form, fname: e.target.value })
                                                 }
-                                                className="border p-1 rounded w-1/2 outline-0 shadow border-gray-300 bg-white"
+                                                className="border p-1 rounded"
                                             />
-                                                                                        <input
-                                                value={form.lname}
-                                                onChange={(e) =>
-                                                    setForm({ ...form, lname: e.target.value })
-                                                }
-                                                className="border p-1 rounded w-1/2 outline-0 shadow border-gray-300 bg-white"
-                                            />                                            
-                                            </div>
-
-                                            
                                         ) : (
                                             `${u.fname} ${u.lname}`
                                         )}
@@ -142,7 +146,7 @@ function UserManager() {
                                                 onChange={(e) =>
                                                     setForm({ ...form, email: e.target.value })
                                                 }
-                                                className="border p-1 rounded outline-0 shadow border-gray-300 bg-white"
+                                                className="border p-1 rounded"
                                             />
                                         ) : (
                                             u.email
@@ -156,7 +160,7 @@ function UserManager() {
                                                 onChange={(e) =>
                                                     setForm({ ...form, role: e.target.value })
                                                 }
-                                                className="border p-1 rounded outline-0 shadow border-gray-300 bg-white"
+                                                className="border p-1 rounded"
                                             >
                                                 <option value="user">user</option>
                                                 <option value="admin">admin(temp)</option>

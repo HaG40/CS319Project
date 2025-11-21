@@ -49,9 +49,9 @@ function User () {
                     <p className="text-gray-600"><b className="text-emerald-800 font-semibold">ชื่อ:</b> {user?.fname} {user?.lname}</p>
                     <p className="text-gray-600"><b className="text-emerald-800 font-semibold">email:</b> {user?.email}</p>
                 </div>
-                <div className="w-2/3 border border-gray-300 shadow rounded-2xl bg-emerald-50 p-4">
+                <div className="w-1/2 border border-gray-300 shadow rounded-2xl bg-emerald-50 p-4">
                 <h1 className="text-xl text-emerald-800 font-bold">กิจกรรมที่คุณลงทะเบียน</h1>
-                <div className="mt-2 w-full max-w-4xl">
+                <div className="mt-2 w-full ">
                     {registeredActivities.length === 0 ? (
                         <p className="text-center text-gray-500">คุณยังไม่ได้ลงทะเบียนเข้าร่วมกิจกรรมใดๆ</p>
                     ) : (
@@ -89,8 +89,6 @@ function User () {
                 </div>
             </div>
 
-
-            {/* ✅ Popup Modal สำหรับยกเลิก */}
             {isCancelOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-xl shadow-xl w-80">
