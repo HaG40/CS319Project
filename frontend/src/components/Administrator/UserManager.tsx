@@ -123,8 +123,8 @@ function UserManager() {
                       className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-1/2"
                     />
                     <input
-                      value={form.fname}
-                      onChange={(e) => setForm({ ...form, fname: e.target.value })}
+                      value={form.lname}
+                      onChange={(e) => setForm({ ...form, lname: e.target.value })}
                       className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-1/2"
                     />
                   </div>
