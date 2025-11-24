@@ -14,7 +14,7 @@ function Header () {
 
     return (
         <>
-            <div className="fixed bg-emerald-400 flex flex-row justify-between w-screen h-16 shadow">
+            <div className="z-1 fixed bg-emerald-400 flex flex-row justify-between w-screen h-16 shadow">
                 <div className="flex justify-start">
                     <p className="mx-1.5 text-white text-4xl font-bold p-4 text-shadow-lg">VolunThai</p>
                 </div>

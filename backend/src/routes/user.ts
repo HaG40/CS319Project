@@ -142,12 +142,20 @@ router.put("/edit/:id", async (req: Request, res: Response) => {
 
 router.delete("/delete/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
+
   try {
-    await prisma.users.delete({ where: { id } });
+    await prisma.activityRegistration.deleteMany({
+      where: { userId: id }
+    });
+    await prisma.users.delete({
+      where: { id }
+    });
     res.json({ message: "Deleted User" });
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Delete failed" });
   }
 });
+
 
 export default router;

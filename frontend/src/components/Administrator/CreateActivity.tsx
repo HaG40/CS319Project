@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FaPlus, FaUpload } from "react-icons/fa";
+import { useEffect } from "react";
 
 function CreateActivity() {
   const [form, setForm] = useState({
@@ -72,6 +73,10 @@ function CreateActivity() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
 
   return (
     <div className="pt-30">
@@ -168,7 +173,6 @@ function CreateActivity() {
               />
             </div>
           </div>
-          {/* ------------------------------------------------------------ */}
 
           <input
             type="number"

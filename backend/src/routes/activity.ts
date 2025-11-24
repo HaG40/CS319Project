@@ -251,6 +251,7 @@ router.delete("/delete/:id", async (req: Request, res: Response) => {
     }
 
     await prisma.activity.delete({ where: { id } });
+    
 
     res.json({ message: "Activity deleted" });
   } catch (err) {
@@ -258,5 +259,31 @@ router.delete("/delete/:id", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+router.get("/participants/:activityId", async (req: Request, res: Response) => {
+  const { activityId } = req.params;
+
+  // ตรวจสอบว่ามีค่า activityId ไหม
+  if (!activityId) {
+    return res.status(400).json({ error: "Missing activityId" });
+  }
+
+  try {
+    const participants = await prisma.activityRegistration.findMany({
+      where: { activityId },
+      orderBy: { registeredAt: "desc" },
+      include: {
+        user: true, // ตรวจสอบว่า relation ชื่อ user ใน schema
+      },
+    });
+
+    res.json(participants);
+  } catch (err) {
+    console.error("Error fetching participants:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 
 export default router;

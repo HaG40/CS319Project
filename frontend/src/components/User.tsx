@@ -40,6 +40,10 @@ function User () {
         }
     }, [user]);
 
+    useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
     return (
         <>
             <div className="pt-25 flex flex-row justify-center gap-6 mb-16 w-full">

@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import React from "react";
 import { useUserStore } from "../store/userStore";
+import { useEffect } from "react";
 
 function Register() {
 
@@ -77,6 +78,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   }
 };
 
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
 
   return (
     <>

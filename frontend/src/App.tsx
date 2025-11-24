@@ -1,3 +1,4 @@
+// App.tsx - Updated with ViewParticipantsPage route
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import LandingPage from './components/LandingPage'
@@ -12,6 +13,7 @@ import { useUserStore } from './store/userStore'
 import UserManager from './components/Administrator/UserManager'
 import CreateActivity from './components/Administrator/CreateActivity'
 import AdminLandingPage from './components/Administrator/AdminLandingPage'
+import ViewParticipants from './components/Administrator/ViewParticipants'
 
 function App() {
   
@@ -20,10 +22,9 @@ function App() {
   return (
     <>
     <Header/>
-    <div className='bg-amber-50 min-h-screen'>
+    <div className=''>
       <Routes>
-        {user?.role === "user" && <Route path='/' element={<LandingPage/>}/> }
-        {user?.role === "admin" && <Route path='/' element={<AdminLandingPage/>}/>}
+        {user?.role === "admin" ? <Route path='/' element={<AdminLandingPage/>}/> : <Route path='/' element={<LandingPage/>}/>}
         <Route path='/category/:category' element={<LandingPage/>}/>
         {user?.role === "user" && <Route path='/user' element={<User/>}/>}
         <Route path='/user/login' element={<Login/>}/>
@@ -31,6 +32,7 @@ function App() {
         <Route path='/about' element={<AbountUs/>}/>
         {user?.role === "admin" && <Route path='/user/manager' element={<UserManager/>}/>}
         {user?.role === "admin" && <Route path='/post' element={<CreateActivity/>}/>}
+        {user?.role === "admin" && <Route path='/admin/participants/:activityId' element={<ViewParticipants/>}/>}
       </Routes>
     </div>
     <Footer/>

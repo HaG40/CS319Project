@@ -92,6 +92,10 @@ function LandingPage () {
     fetchCategory();
     }, [category]);
 
+    useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
 
 
     const openModal = (activity: Activity) => {

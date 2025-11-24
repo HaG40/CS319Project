@@ -1,2 +1,25 @@
 @import "tailwindcss";
 
+body {
+  @apply bg-amber-50;
+}
+
+input[id^="dt-search-"] {
+  background-color: white !important;
+  outline: 0;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.25em;
+  @apply shadow rounded border border-gray-300;
+}
+
+.dt-info{
+    @apply mt-2
+}
+
+.dt-paging{
+    @apply float-end flex items-center justify-end
+}
+
+#dt-length-1{
+    @apply bg-white outline-0
+}
