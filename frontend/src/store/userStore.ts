@@ -8,7 +8,13 @@ interface UserState {
   isAuthenticated: boolean;
 
   login: (username: string, password: string) => Promise<boolean>;
-  register: (username: string,fname: string,lname: string,email: string, password: string) => Promise<boolean>;
+  register: (
+    username: string,
+    fname: string,
+    lname: string,
+    email: string,
+    password: string
+  ) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -38,7 +44,7 @@ export const useUserStore = create<UserState>()(
           return false;
         }
       },
-      
+
       register: async (username, fname, lname, email, password) => {
         try {
           const res = await axios.post(

@@ -1,4 +1,10 @@
+import { useEffect } from "react";
 function AboutUs() {
+
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
   return (
     <div className="bg-amber-50">
       <div className="max-w-5xl mx-auto pt-28 px-6">

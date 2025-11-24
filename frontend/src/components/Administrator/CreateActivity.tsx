@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FaPlus, FaUpload } from "react-icons/fa";
+import { useEffect } from "react";
 
 function CreateActivity() {
   const [form, setForm] = useState({
@@ -73,8 +74,12 @@ function CreateActivity() {
     setLoading(false);
   };
 
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
   return (
-    <div className="pt-30">
+    <div className="py-30">
       <div className="mx-auto min-w-1/4 border border-gray-300 shadow rounded-2xl p-6 pb-10 flex flex-col justify-center gap-4 w-full max-w-xl bg-white">
         <h2 className="text-2xl font-bold flex items-center gap-2 mb-2 text-emerald-700">
           <FaPlus /> สร้างกิจกรรมใหม่
@@ -168,7 +173,6 @@ function CreateActivity() {
               />
             </div>
           </div>
-          {/* ------------------------------------------------------------ */}
 
           <input
             type="number"

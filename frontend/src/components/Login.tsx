@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import React from "react";
+import { useEffect } from "react";
 import { useUserStore } from "../store/userStore";
 
 function Login() {
@@ -61,6 +62,10 @@ function Login() {
       setLoading(false);
     }
   };
+  
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
 
 
   return (

@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import React from "react";
 import { useUserStore } from "../store/userStore";
+import { useEffect } from "react";
 
 function Register() {
 
@@ -55,7 +56,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   try {
     const succes = await register(username, fname, lname, email, password);
     if (!succes) {
-      setErrorMessage("ชื่อผู้ใช้หรือข้อมูลไม่ถูกต้อง");
+      setErrorMessage("ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว");
       setLoading(false);
       setRequire(false);
       return;
@@ -77,6 +78,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   }
 };
 
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
 
   return (
     <>

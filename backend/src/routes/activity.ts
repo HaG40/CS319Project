@@ -259,4 +259,27 @@ router.delete("/delete/:id", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/participants/:activityId", async (req: Request, res: Response) => {
+  const { activityId } = req.params;
+
+  if (!activityId) {
+    return res.status(400).json({ error: "Missing activityId" });
+  }
+
+  try {
+    const participants = await prisma.activityRegistration.findMany({
+      where: { activityId },
+      orderBy: { registeredAt: "desc" },
+      include: {
+        user: true,
+      },
+    });
+
+    res.json(participants);
+  } catch (err) {
+    console.error("Error fetching participants:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default router;

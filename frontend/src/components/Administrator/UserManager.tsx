@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaTrash, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import type { User } from "../../types/User";
 import { useUserStore } from "../../store/userStore";
 import axios from "axios";
+import $ from "jquery";
+import "datatables.net-dt";
+import "datatables.net-dt/css/dataTables.dataTables.css";
 
 function UserManager() {
   const { user } = useUserStore();
@@ -15,41 +18,116 @@ function UserManager() {
     email: "",
     role: "",
   });
-
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
 
+  const tableRef = useRef<HTMLTableElement | null>(null);
+  const dataTableInstance = useRef<any>(null);
+
   const fetchUsers = async () => {
-    const res = await axios.get("http://localhost:3000/api/user/all");
-    setUsers(res.data.users);
+    try {
+      const res = await axios.get("http://localhost:3000/api/user/all");
+      setUsers(res.data.users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
   };
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  const startEdit = (user: User) => {
-    setEditingUser(user.id);
+    useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
+  // Initialize DataTable when users change
+  useEffect(() => {
+    // Destroy existing DataTable instance
+    if (dataTableInstance.current) {
+      dataTableInstance.current.destroy();
+      dataTableInstance.current = null;
+    }
+
+    // Initialize DataTable only if there are users
+    if (tableRef.current && users.length > 0) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        if (tableRef.current) {
+          dataTableInstance.current = $(tableRef.current).DataTable({
+            paging: true,
+            searching: true,
+            info: true,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50, 100],
+            order: [[0, "asc"]],
+            language: {
+              search: "ค้นหา:",
+              lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+              info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+              infoEmpty: "ไม่มีข้อมูล",
+              infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+              paginate: {
+                first: "หน้าแรก",
+                last: "หน้าสุดท้าย",
+                next: "ถัดไป",
+                previous: "ก่อนหน้า",
+              },
+              zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+            },
+          });
+        }
+      }, 0);
+    }
+
+    return () => {
+      if (dataTableInstance.current) {
+        dataTableInstance.current.destroy();
+        dataTableInstance.current = null;
+      }
+    };
+  }, [users]);
+
+  const startEdit = (u: User) => {
+    setEditingUser(u.id);
     setForm({
-      username: user.username,
-      fname: user.fname,
-      lname: user.lname,
-      email: user.email,
-      role: user.role,
+      username: u.username,
+      fname: u.fname,
+      lname: u.lname,
+      email: u.email,
+      role: u.role,
     });
   };
 
   const cancelEdit = () => {
     setEditingUser("");
+    setForm({
+      username: "",
+      fname: "",
+      lname: "",
+      email: "",
+      role: "",
+    });
   };
 
   const saveUser = async (id: string) => {
-    await axios.put(`http://localhost:3000/api/user/edit/${id}`, form);
-    setEditingUser("");
-    fetchUsers();
+    try {
+      await axios.put(`http://localhost:3000/api/user/edit/${id}`, form);
+      setEditingUser("");
+      setForm({
+        username: "",
+        fname: "",
+        lname: "",
+        email: "",
+        role: "",
+      });
+      await fetchUsers();
+    } catch (error) {
+      console.error("Error saving user:", error);
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    }
   };
 
-  // แทน confirm() ด้วย modal
   const openDeleteModal = (id: string) => {
     setDeleteUserId(id);
     setIsDeleteOpen(true);
@@ -62,9 +140,14 @@ function UserManager() {
 
   const confirmDelete = async () => {
     if (!deleteUserId) return;
-    await axios.delete(`http://localhost:3000/api/user/delete/${deleteUserId}`);
-    closeDeleteModal();
-    fetchUsers();
+    try {
+      await axios.delete(`http://localhost:3000/api/user/delete/${deleteUserId}`);
+      closeDeleteModal();
+      await fetchUsers();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("เกิดข้อผิดพลาดในการลบผู้ใช้");
+    }
   };
 
   return (
@@ -73,110 +156,141 @@ function UserManager() {
         User Manager For Administrator
       </h1>
 
-      <table className="w-full border border-gray-400 shadow rounded-lg">
-        <thead className="bg-emerald-100 ">
-          <tr>
-            <th className="p-3 border-x text-white bg-emerald-700">Username</th>
-            <th className="p-3 border-x text-white bg-emerald-700">ชื่อ</th>
-            <th className="p-3 border-x text-white bg-emerald-700">Email</th>
-            <th className="p-3 border-x text-white bg-emerald-700">Role</th>
-            <th className="p-3 border-x text-white bg-emerald-700 w-40">Actions</th>
-          </tr>
-        </thead>
+      <div className="overflow-x-auto">
+        <table
+          ref={tableRef}
+          className="w-full border border-gray-400 shadow rounded-lg display"
+          style={{ width: "100%" }}
+        >
+          <thead className="bg-emerald-100">
+            <tr>
+              <th className="p-3 border-x text-white bg-emerald-700">Username</th>
+              <th className="p-3 border-x text-white bg-emerald-700">ชื่อ - นามสกุล</th>
+              <th className="p-3 border-x text-white bg-emerald-700">Email</th>
+              <th className="p-3 border-x text-white bg-emerald-700">Role</th>
+              <th className="p-3 border-x text-white bg-emerald-700 w-40">Actions</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr className="border text-gray-800 text-shadow-sm bg-emerald-300">
-            <td className="p-3 border border-gray-400 shadow">
-              <p>{user?.username}</p>
-            </td>
-            <td className="p-3 border border-gray-400 shadow">
-              <p>{user?.fname} {user?.lname}</p>
-            </td>
-            <td className="p-3 border border-gray-400 shadow">
-              <p>{user?.email}</p>
-            </td>
-            <td className="p-3 border border-gray-400 shadow">
-              <p>{user?.role}</p>
-            </td>
-            <td className="p-3 border border-gray-400 bg-amber-100 shadow">
-            </td>
-          </tr>
+          <tbody>
 
-          {users.map((u: User) => (
-            u.role === "user" &&
-            <tr key={u.id} className="border text-emerald-700 text-shadow-2xs hover:bg-amber-200 bg-amber-100">
+            <tr className="border text-gray-800 text-shadow-sm bg-emerald-300">
+              <td className="p-3 border border-gray-400 shadow">{user?.username}</td>
               <td className="p-3 border border-gray-400 shadow">
-                {editingUser === u.id ? (
-                  <input
-                    value={form.username}
-                    onChange={(e) => setForm({ ...form, username: e.target.value })}
-                    className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0"
-                  />
-                ) : u.username}
+                {user?.fname} {user?.lname}
               </td>
-              <td className="p-3 border border-gray-400 shadow outline-0">
-                {editingUser === u.id ? (
-                  <div className="flex flex-row gap-2">
-                    <input
-                      value={form.fname}
-                      onChange={(e) => setForm({ ...form, fname: e.target.value })}
-                      className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-1/2"
-                    />
-                    <input
-                      value={form.lname}
-                      onChange={(e) => setForm({ ...form, lname: e.target.value })}
-                      className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-1/2"
-                    />
-                  </div>
-
-                ) : `${u.fname} ${u.lname}`}
-              </td>
-              <td className="p-3 border border-gray-400 shadow">
-                {editingUser === u.id ? (
-                  <input
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0"
-                  />
-                ) : u.email}
-              </td>
-              <td className="p-3 border border-gray-400 shadow">
-                {editingUser === u.id ? (
-                  <select
-                    value={form.role}
-                    onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0"
-                  >
-                    <option value="user">user</option>
-                    <option value="admin">admin(temp)</option>
-                  </select>
-                ) : u.role}
-              </td>
-              <td className="p-3 border border-gray-400 shadow text-center space-x-3">
-                {editingUser === u.id ? (
-                  <>
-                    <button onClick={() => saveUser(u.id)} className="text-emerald-400 cursor-pointer">
-                      <FaSave size={22} />
-                    </button>
-                    <button onClick={cancelEdit} className="text-red-400 cursor-pointer">
-                      <FaTimes size={22} />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => startEdit(u)} className="text-blue-400 cursor-pointer">
-                      <FaEdit size={22} />
-                    </button>
-                    <button onClick={() => openDeleteModal(u.id)} className="text-red-400 cursor-pointer">
-                      <FaTrash size={22} />
-                    </button>
-                  </>
+              <td className="p-3 border border-gray-400 shadow">{user?.email}</td>
+              <td className="p-3 border border-gray-400 shadow">{user?.role}</td>
+              <td className="p-3 border border-gray-400 bg-black shadow text-center text-green-500 font-extrabold">
+                {user && user.username === "admin" && user.role === "admin" && (
+                  <p>🟢 ONLINE</p>
                 )}
               </td>
             </tr>
-          ))}
-        </tbody>
-      </table>
+
+            {/* Other users */}
+            {users
+              .filter((u) => u.username !== "admin")
+              .map((u: User) => (
+                <tr
+                  key={u.id}
+                  className="border text-emerald-700 text-shadow-2xs hover:bg-amber-200 bg-amber-100"
+                >
+                  <td className="p-3 border border-gray-400 shadow">
+                    {editingUser === u.id ? (
+                      <input
+                        value={form.username}
+                        onChange={(e) => setForm({ ...form, username: e.target.value })}
+                        className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-full"
+                      />
+                    ) : (
+                      u.username
+                    )}
+                  </td>
+
+                  <td className="p-3 border border-gray-400 shadow">
+                    {editingUser === u.id ? (
+                      <input
+                        value={`${form.fname} ${form.lname}`.trim()}
+                        onChange={(e) => {
+                          const full = e.target.value.trim();
+                          const parts = full.split(" ");
+                          const fname = parts[0] || "";
+                          const lname = parts.slice(1).join(" ") || "";
+                          setForm({ ...form, fname, lname });
+                        }}
+                        className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-full"
+                      />
+                    ) : (
+                      `${u.fname} ${u.lname}`
+                    )}
+                  </td>
+
+                  <td className="p-3 border border-gray-400 shadow">
+                    {editingUser === u.id ? (
+                      <input
+                        value={form.email}
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                        className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0 w-full"
+                      />
+                    ) : (
+                      u.email
+                    )}
+                  </td>
+
+                  <td className="p-3 border border-gray-400 shadow">
+                    {editingUser === u.id ? (
+                      <select
+                        value={form.role}
+                        onChange={(e) => setForm({ ...form, role: e.target.value })}
+                        className="border p-1 rounded border-gray-300 shadow bg-white mx-2 outline-0"
+                      >
+                        <option value="user">user</option>
+                        <option value="admin">admin(temp)</option>
+                      </select>
+                    ) : (
+                      u.role
+                    )}
+                  </td>
+
+                  <td className="p-3 border border-gray-400 shadow text-center space-x-3">
+                    {editingUser === u.id ? (
+                      <>
+                        <button
+                          onClick={() => saveUser(u.id)}
+                          className="text-emerald-400 cursor-pointer hover:text-emerald-600"
+                        >
+                          <FaSave size={22} />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="text-red-400 cursor-pointer hover:text-red-600"
+                        >
+                          <FaTimes size={22} />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => startEdit(u)}
+                          className="text-blue-400 cursor-pointer hover:text-blue-600"
+                        >
+                          <FaEdit size={22} />
+                        </button>
+                        <button
+                          onClick={() => openDeleteModal(u.id)}
+                          className="text-red-400 cursor-pointer hover:text-red-600"
+                        >
+                          <FaTrash size={22} />
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Delete confirmation modal */}
       {isDeleteOpen && (

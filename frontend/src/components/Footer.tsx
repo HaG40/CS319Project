@@ -1,11 +1,14 @@
 import { FaFacebookF, FaInstagram, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { useUserStore } from "../store/userStore";
 
 function Footer() {
-  return (
-    <footer className="bg-emerald-700 text-white mt-20">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
 
-        {/* Logo + Description */}
+  const {user} = useUserStore()
+
+  return (
+    <footer className="bg-emerald-700 text-white flex flex-col justify-end  ">
+      <div className="max-w-7xl mx-auto px-6 py-7 grid grid-cols-1 md:grid-cols-3 gap-10">
+
         <div>
           <h2 className="text-3xl font-bold mb-3">VolunThai</h2>
           <p className="text-gray-200 leading-relaxed">
@@ -14,18 +17,20 @@ function Footer() {
           </p>
         </div>
 
-        {/* Quick links */}
         <div>
           <h3 className="text-xl font-semibold mb-4">เมนู</h3>
           <ul className="space-y-2 text-gray-200">
             <li><a href="/" className="hover:underline">กิจกรรมทั้งหมด</a></li>
             <li><a href="/about" className="hover:underline">เกี่ยวกับเรา</a></li>
+            {user?.role === "admin" && user.username === "admin" ?
+            <li><a href="/user/manager" className="hover:underline">บัญชีของฉัน</a></li> 
+            :
             <li><a href="/user" className="hover:underline">บัญชีของฉัน</a></li>
-            <li><a  className="hover:underline cursor-pointer">ติดต่อเรา</a></li>
+            }
+            <li><a className="hover:underline cursor-pointer">ติดต่อเรา</a></li>
           </ul>
         </div>
 
-        {/* Contact */}
         <div>
           <h3 className="text-xl font-semibold mb-4">ช่องทางติดต่อ</h3>
 
@@ -44,16 +49,11 @@ function Footer() {
             </li>
           </ul>
 
-          {/* Social icons */}
           <div className="flex gap-4 mt-6">
-            <a
-              className="p-2 bg-emerald-600 hover:bg-emerald-500 rounded-full transition cursor-pointer"
-            >
+            <a className="p-2 bg-emerald-600 hover:bg-emerald-500 rounded-full transition cursor-pointer">
               <FaFacebookF />
             </a>
-            <a
-              className="p-2 bg-emerald-600 hover:bg-emerald-500 rounded-full transition cursor-pointer"
-            >
+            <a className="p-2 bg-emerald-600 hover:bg-emerald-500 rounded-full transition cursor-pointer">
               <FaInstagram />
             </a>
           </div>
@@ -61,7 +61,6 @@ function Footer() {
 
       </div>
 
-      {/* Bottom bar */}
       <div className="text-center py-4 bg-emerald-800 text-gray-300 text-sm">
         © {new Date().getFullYear()} VolunThai — All rights reserved.
       </div>
