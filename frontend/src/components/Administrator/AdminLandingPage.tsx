@@ -20,15 +20,12 @@ function AdminLandingPage() {
 
   const [search, setSearch] = useState("");
 
-  // modal edit
   const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState<any>(null);
 
-  // modal delete
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  // fetch activities
   const fetchCategory = async () => {
     if (category) await fetchByCategory(encodeURIComponent(category));
     else await fetchAll();
@@ -42,7 +39,6 @@ function AdminLandingPage() {
   window.scrollTo(0, 0);
 }, []);
 
-  // ---------------- Edit Modal ----------------
   const openEditModal = (activity: Activity) => {
     if (!user) return toast.warn("กรุณาเข้าสู่ระบบในฐานะแอดมิน");
 
@@ -91,7 +87,6 @@ function AdminLandingPage() {
     }
   };
 
-  // ---------------- Delete Modal ----------------
   const openDeleteModal = (id: string) => {
     setDeleteId(id);
     setDeleteOpen(true);
@@ -115,7 +110,6 @@ function AdminLandingPage() {
     }
   };
 
-  // ---------------- Navigate to Participants Page ----------------
   const goToParticipants = (activityId: string, activityTitle: string) => {
     navigate(`/admin/participants/${activityId}`, {
       state: { activityTitle },
@@ -232,7 +226,6 @@ function AdminLandingPage() {
         </div>
       </div>
 
-      {/* ---------------- Edit Modal ---------------- */}
       {editOpen && editData && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-96">
@@ -309,13 +302,28 @@ function AdminLandingPage() {
                 }
                 placeholder="ผู้จัด"
               />
-              <input
-                type="file"
-                className="border p-2 rounded"
-                onChange={(e) =>
-                  setEditData({ ...editData, image: e.target.files?.[0] })
-                }
-              />
+              <div className="flex flex-col items-start gap-2">
+                    <label
+                      htmlFor="fileUpload"
+                      className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                    >
+                      {editData.image ? "เปลี่ยนรูปภาพ" : "อัปโหลดรูปภาพ"}
+                    </label>
+
+                    <input
+                      id="fileUpload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => setEditData({ ...editData, image: e.target.files?.[0] })}
+                    />
+
+                    {editData.image && (
+                      <span className="text-gray-700 text-sm">
+                        ชื่อไฟล์: {editData.image.name}
+                      </span>
+                    )}
+                  </div>
             </div>
 
             <div className="flex justify-between mt-5">
@@ -336,7 +344,6 @@ function AdminLandingPage() {
         </div>
       )}
 
-      {/* ---------------- Delete Modal ---------------- */}
       {deleteOpen && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-80">

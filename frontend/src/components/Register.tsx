@@ -53,6 +53,12 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     return;
   }
 
+    if (username === "admin") {
+    setErrorMessage("ชื่อผู้ใข้นี้ถูกจำกัดสิทธิ์ในการใช้งาน");
+    setLoading(false);
+    return;
+  }
+
   try {
     const succes = await register(username, fname, lname, email, password);
     if (!succes) {
