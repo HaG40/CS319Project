@@ -22,6 +22,11 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   setErrorMessage("");
   setLoading(true);
 
+  setUsername(username.trim())
+  setEmail(email.trim())
+  setFname(fname.trim())
+  setLname(lname.trim())
+
   if (!username || !password || !email || !fname || !lname) {
     setErrorMessage("กรุณากรอกข้อมูลให้ครบถ้วน");
     setRequire(true);

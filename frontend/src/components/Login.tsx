@@ -19,6 +19,8 @@ function Login() {
     setErrorMessage("");
     setLoading(true);
 
+    setUsername(username.trim())
+
     if (!username || !password) {
       setRequire(true);
       setErrorMessage("กรุณากรอกทั้งชื่อผู้ใช้และรหัสผ่าน");

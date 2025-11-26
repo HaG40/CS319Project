@@ -3,6 +3,7 @@ import { useActivityStore } from "../store/activityStore"
 import { useUserStore } from "../store/userStore"
 import React, { useEffect } from "react"
 import { FaTimes } from "react-icons/fa";
+import formatDate from "../utils/FormatDate";
 
 function User () {
 
@@ -60,15 +61,17 @@ function User () {
                                 <li key={activity.id} className=" mx-auto justify-between flex flex-row gap-6 border border-gray-300 shadow rounded-2xl bg-white p-4">
                                     <div className="flex flex-row justify-start gap-8">
                                         <img
-                                            src={activity.image ? `http://localhost:3000${activity.image}` : 'https://via.placeholder.com/150'}
+                                            src={activity.image ? `http://localhost:3000${activity.image}` : 'https://placehold.co/600x400?text=No Image'}
                                             alt={activity.title}
                                             className="w-60 h-40 object-cover rounded-md border border-gray-300 shadow"
                                         />
                                         <div className="flex flex-col justify-center">
                                             <h2 className="text-xl font-semibold text-emerald-600 mb-2">{activity.title}</h2>
                                             <p className="text-gray-700">{activity.description}</p>
-                                            <p className="text-sm text-gray-500 mt-2">ประเภท: {activity.category}</p>
-                                            <p className="text-sm text-gray-500">จัดโดย: {activity.organizer}</p>
+                                            <p className="text-sm text-gray-500 mt-2"><b>เริ่ม:</b> {formatDate(activity.start_date)}</p>
+                                            <p className="text-sm text-gray-500"><b>สิ้นสุด:</b> {formatDate(activity.end_date)}</p>
+                                            <p className="text-sm text-gray-500 mt-2"><b>ประเภท:</b> {activity.category}</p>
+                                            <p className="text-sm text-gray-500"><b>จัดโดย:</b> {activity.organizer}</p>
                                         </div>
                                     </div>
                                 

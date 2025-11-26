@@ -12,7 +12,6 @@ interface TokenPayload {
   email: string;
 }
 
-// Middleware ตรวจสอบ Token
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies?.token;
 
@@ -27,7 +26,6 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// REGISTER
 router.post("/register", async (req, res) => {
   try {
     const { username, fname, lname, email, password } = req.body;
@@ -64,7 +62,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// LOGIN
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -98,7 +95,6 @@ router.post("/login", async (req, res) => {
   });
 });
 
-// LOGOUT
 router.post("/logout", (req, res) => {
   res.clearCookie("token");
   res.json({ message: "Logged out" });
@@ -144,12 +140,28 @@ router.delete("/delete/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
+    const registered = await prisma.activityRegistration.findMany({
+      where: { userId: id },
+      select: { activityId: true },
+    });
+
+    for (const reg of registered) {
+      await prisma.activity.update({
+        where: { id: reg.activityId },
+        data: {
+          occupied: { decrement: 1 },
+        },
+      });
+    }
+
     await prisma.activityRegistration.deleteMany({
       where: { userId: id },
     });
+
     await prisma.users.delete({
       where: { id },
     });
+
     res.json({ message: "Deleted User" });
   } catch (error) {
     console.error(error);

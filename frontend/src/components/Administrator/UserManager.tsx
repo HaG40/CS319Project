@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
-import { FaTrash, FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import { FaTrash, FaEdit, FaSave, FaTimes, FaEye } from "react-icons/fa";
 import type { User } from "../../types/User";
 import { useUserStore } from "../../store/userStore";
 import axios from "axios";
 import $ from "jquery";
 import "datatables.net-dt";
 import "datatables.net-dt/css/dataTables.dataTables.css";
+import { useNavigate } from "react-router-dom";
 
 function UserManager() {
   const { user } = useUserStore();
@@ -21,6 +22,7 @@ function UserManager() {
   });
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const tableRef = useRef<HTMLTableElement | null>(null);
   const dataTableInstance = useRef<any>(null);
@@ -145,6 +147,12 @@ function UserManager() {
     }
   };
 
+  const goToRegisteredAct = (userId: string, username : string) => {
+    navigate(`/admin/viewregistered/${userId}`, {
+      state: { username },
+    });
+  };
+
   return (
     <div className="p-10">
       <h1 className="text-3xl font-bold mb-6 text-emerald-700 mt-15">
@@ -183,7 +191,6 @@ function UserManager() {
               </td>
             </tr>
 
-            {/* Other users */}
             {users
               .filter((u) => u.username !== "admin")
               .map((u: User) => (
@@ -266,6 +273,12 @@ function UserManager() {
                       </>
                     ) : (
                       <>
+                        <button
+                          onClick={() => goToRegisteredAct(u.id,u.username)}
+                          className="text-emerald-400 cursor-pointer hover:text-emerald-600"
+                        >
+                          <FaEye size={22} />
+                        </button>                      
                         <button
                           onClick={() => startEdit(u)}
                           className="text-blue-400 cursor-pointer hover:text-blue-600"

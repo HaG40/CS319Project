@@ -125,8 +125,8 @@ function ViewParticipantsPage() {
   };
 
   useEffect(() => {
-  window.scrollTo(0, 0);
-}, []);
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="p-10 pt-25">

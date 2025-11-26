@@ -182,17 +182,11 @@ function LandingPage() {
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-5 w-full">
               {activities.map((activity: Activity) => (
                 <li key={activity.id}>
-                  {activity.image ? (
-                    <img
-                      src={`http://localhost:3000${activity.image}`}
-                      alt={activity.title}
-                      className="w-full h-65 object-cover rounded-t-lg"
-                    />
-                  ) : (
-                    <div className="w-full h-65 bg-gray-200 flex justify-center items-center rounded-t-lg">
-                      <span className="text-gray-500">ไม่มีรูปภาพ</span>
-                    </div>
-                  )}
+                  <img
+                    src={activity.image ? `http://localhost:3000${activity.image}` : `https://placehold.co/600x400?text=No Image`}
+                    alt={activity.title}
+                    className="w-full h-65 object-cover rounded-t-lg"
+                  />
 
                   <div className="border-b h-60 rounded-b-2xl px-4 pb-4 pt-2 flex flex-col shadow-lg border-gray-200 bg-white">
                     <h2 className="font-semibold text-lg text-emerald-600 mb-1">

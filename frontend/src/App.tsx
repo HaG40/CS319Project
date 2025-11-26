@@ -14,6 +14,7 @@ import UserManager from './components/Administrator/UserManager'
 import CreateActivity from './components/Administrator/CreateActivity'
 import AdminLandingPage from './components/Administrator/AdminLandingPage'
 import ViewParticipants from './components/Administrator/ViewParticipants'
+import ViewRegisteredAct from './components/Administrator/ViewRegisteredAct'
 
 function App() {
   const { user } = useUserStore();
@@ -37,8 +38,11 @@ function App() {
           <Route path="/about" element={<AbountUs />} />
           {user?.role === "admin" && user.username === "admin" && <Route path="/user/manager" element={<UserManager />} />}
           {user?.role === "admin" && <Route path="/post" element={<CreateActivity />} />}
-          {user?.role === "admin" && (
-            <Route path="/admin/participants/:activityId" element={<ViewParticipants />} />
+          {user?.role === "admin" && user.username === "admin" && (
+            <>
+              <Route path="/admin/participants/:activityId" element={<ViewParticipants />} />
+              <Route path="/admin/viewregistered/:userId" element={<ViewRegisteredAct />} />
+            </>
           )}
         </Routes>
       </main>
