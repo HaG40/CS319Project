@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -8,7 +9,6 @@ import { toast } from "react-toastify";
 import { FaArrowLeft } from "react-icons/fa";
 import type { Participant } from "../../types/Participants";
 
-// Custom CSS to move DataTable controls below the table
 const customStyles = `
   .dataTables_wrapper .dataTables_filter {
     float: none !important;
@@ -112,7 +112,6 @@ function ViewParticipantsPage() {
       }, 0);
     }
 
-    // Cleanup function
     return () => {
       if (dataTableInstance.current) {
         dataTableInstance.current.destroy();

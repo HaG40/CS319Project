@@ -8,18 +8,14 @@ function AboutUs() {
   return (
     <div className="bg-amber-50">
       <div className="max-w-5xl mx-auto pt-28 px-6">
-
-        {/* Title */}
         <h1 className="text-4xl font-bold text-emerald-700 text-center">
           เกี่ยวกับเรา
         </h1>
 
-        {/* Subtitle */}
         <p className="text-center text-gray-600 text-lg mt-3">
           VolunThai – แพลตฟอร์มที่เชื่อมต่อคนไทยกับโอกาสทำความดีได้ง่ายขึ้น
         </p>
 
-        {/* Section 1 */}
         <div className="mt-12">
           <h2 className="text-2xl font-semibold text-emerald-600 mb-3">
             วิสัยทัศน์ (Vision)
@@ -31,7 +27,6 @@ function AboutUs() {
           </p>
         </div>
 
-        {/* Section 2 */}
         <div className="mt-10">
           <h2 className="text-2xl font-semibold text-emerald-600 mb-3">
             พันธกิจ (Mission)
@@ -44,7 +39,6 @@ function AboutUs() {
           </ul>
         </div>
 
-        {/* Section 3 */}
         <div className="mt-10">
           <h2 className="text-2xl font-semibold text-emerald-600 mb-3">
             ทำไมต้อง VolunThai?
@@ -56,7 +50,6 @@ function AboutUs() {
           </p>
         </div>
 
-        {/* Features */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
 
           <div className="p-6 rounded-xl shadow-lg bg-emerald-50">
@@ -88,7 +81,6 @@ function AboutUs() {
 
         </div>
 
-        {/* CTA */}
         <div className="mt-16 mb-20 text-center bg-amber-50">
           <h3 className="text-2xl font-semibold text-emerald-700 mb-4">
             เริ่มต้นทำความดีไปด้วยกัน

@@ -31,5 +31,5 @@ html, body, #root {
 }
 
 .main-container {
-  flex: 1; /* ดัน footer ลงไปล่าง */
+  flex: 1;
 }

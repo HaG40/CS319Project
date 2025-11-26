@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import axios from "axios";
 import { FaPlus, FaUpload } from "react-icons/fa";
@@ -150,7 +151,6 @@ function CreateActivity() {
             className="w-full p-2 border rounded-lg border-gray-300 outline-0 shadow"
           />
 
-          {/* ---------------------- DATE + TIME ------------------------ */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm">เริ่มวันที่และเวลา</label>

@@ -22,7 +22,6 @@ export const useActivityStore = create<ActivityState>((set) => ({
   isLoading: false,
   error: null,
 
-  // ✅ ดึงกิจกรรมทั้งหมด
   fetchAll: async () => {
     try {
       set({ isLoading: true, error: null });
@@ -35,7 +34,6 @@ export const useActivityStore = create<ActivityState>((set) => ({
     }
   },
 
-  // ✅ ดึงตามหมวดหมู่
   fetchByCategory: async (category: string) => {
     try {
       set({ isLoading: true, error: null });

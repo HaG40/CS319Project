@@ -21,8 +21,6 @@ function App() {
   return (
     <>
       <Header />
-
-      {/* 🔥 ต้องใช้ main-container เพื่อดัน footer ลงล่าง */}
       <main className="main-container">
         <Routes>
           {user?.role === "admin" && user.username === "admin"

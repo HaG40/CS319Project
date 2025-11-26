@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 import { FaTrash, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import type { User } from "../../types/User";
@@ -41,17 +42,12 @@ function UserManager() {
   window.scrollTo(0, 0);
 }, []);
 
-  // Initialize DataTable when users change
   useEffect(() => {
-    // Destroy existing DataTable instance
     if (dataTableInstance.current) {
       dataTableInstance.current.destroy();
       dataTableInstance.current = null;
     }
-
-    // Initialize DataTable only if there are users
     if (tableRef.current && users.length > 0) {
-      // Small delay to ensure DOM is ready
       setTimeout(() => {
         if (tableRef.current) {
           dataTableInstance.current = $(tableRef.current).DataTable({
@@ -79,7 +75,6 @@ function UserManager() {
         }
       }, 0);
     }
-
     return () => {
       if (dataTableInstance.current) {
         dataTableInstance.current.destroy();
@@ -291,8 +286,7 @@ function UserManager() {
           </tbody>
         </table>
       </div>
-
-      {/* Delete confirmation modal */}
+      
       {isDeleteOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-80">

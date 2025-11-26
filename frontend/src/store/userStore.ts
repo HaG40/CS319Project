@@ -25,7 +25,6 @@ export const useUserStore = create<UserState>()(
       user: null,
       isAuthenticated: false,
 
-      // ✅ LOGIN
       login: async (username, password) => {
         try {
           const res = await axios.post(
@@ -62,7 +61,6 @@ export const useUserStore = create<UserState>()(
         }
       },
 
-      // ✅ LOGOUT
       logout: async () => {
         await axios.post(
           "http://localhost:3000/api/user/logout",
@@ -72,7 +70,6 @@ export const useUserStore = create<UserState>()(
         set({ user: null, isAuthenticated: false });
       },
 
-      // ✅ CHECK AUTH
       checkAuth: async () => {
         try {
           const res = await axios.get("http://localhost:3000/api/user/me", {

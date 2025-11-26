@@ -28,7 +28,6 @@ function LandingPage() {
 
   const [search, setSearch] = React.useState("")
 
-  // ⭐ ดึงข้อมูลล่าสุดของผู้ใช้มาเติมในฟอร์ม
   const loadUserInfo = async () => {
     if (!user?.id) return
     try {
@@ -45,7 +44,6 @@ function LandingPage() {
     }
   }
 
-  // ⭐ ตรวจสอบว่า user เข้าร่วมกิจกรรมนี้แล้วหรือยัง
   const hasUserJoined = (activity: Activity) => {
     return activity.participants?.some((p: any) => p.userId === user?.id)
   }
@@ -57,7 +55,6 @@ function LandingPage() {
         return
       }
 
-      // ⭐ ป้องกันสมัครซ้ำ
       if (hasUserJoined(selectedActivity)) {
         toast.warn("คุณสมัครกิจกรรมนี้แล้ว")
         return
@@ -74,25 +71,21 @@ function LandingPage() {
         return
       }
 
-      // email check
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         toast.warn("รูปแบบอีเมลไม่ถูกต้อง")
         return
       }
 
-      // phone check
       if (!/^0[0-9]{9}$/.test(phone)) {
         toast.warn("กรุณากรอกเบอร์มือถือ 10 หลักที่ถูกต้อง")
         return
       }
 
-      // full check
       if (selectedActivity.occupied >= selectedActivity.slots) {
         toast.warn("กิจกรรมนี้เต็มแล้ว")
         return
       }
 
-      // ส่งข้อมูลไป backend
       const res = await axios.post(
         `http://localhost:3000/api/act/join/${selectedActivity.id}`,
         {
@@ -167,7 +160,6 @@ function LandingPage() {
               {category ? `กิจกรรมหมวด: ${category}` : "กิจกรรมทั้งหมด"}
             </h1>
 
-            {/* Search */}
             <div className="flex flex-row justify-between mx-auto w-1/2 mb-5 items-center border px-3 py-2 shadow-lg rounded-xl border-gray-300 bg-white">
               <input
                 type="text"
@@ -187,7 +179,6 @@ function LandingPage() {
               <p className="text-gray-500 mx-auto mt-5">ไม่พบข้อมูล</p>
             )}
 
-            {/* Activity Grid */}
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-5 w-full">
               {activities.map((activity: Activity) => (
                 <li key={activity.id}>
@@ -255,7 +246,6 @@ function LandingPage() {
         </div>
       </div>
 
-      {/* Modal */}
       {isOpen && selectedActivity && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-96">
@@ -265,7 +255,6 @@ function LandingPage() {
               <b>กิจกรรม:</b> {selectedActivity.title}
             </p>
 
-            {/* FORM */}
             <div className="flex flex-col gap-2.5 mb-5">
               <input
                 className="input input-bordered px-2 w-full border shadow p-1 rounded-lg outline-0"
