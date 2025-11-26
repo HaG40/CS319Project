@@ -6,8 +6,9 @@ import $ from "jquery";
 import "datatables.net-dt";
 import "datatables.net-dt/css/dataTables.dataTables.css";
 import { toast } from "react-toastify";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaTrash } from "react-icons/fa";
 import type { Participant } from "../../types/Participants";
+import { useActivityStore } from "../../store/activityStore";
 
 const customStyles = `
   .dataTables_wrapper .dataTables_filter {
@@ -54,6 +55,10 @@ function ViewParticipantsPage() {
   const navigate = useNavigate();
   const activityTitle = location.state?.activityTitle || "กิจกรรม";
 
+  const { cancelRegistration } = useActivityStore()
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [cancelUserId, setCancelUserId] = useState("")
+
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -73,6 +78,27 @@ function ViewParticipantsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const openCancelModal = (userId : string) => {
+      setCancelUserId(userId)
+      setIsCancelOpen(true);
+  };
+
+  const closeCancelModal = () => {
+      setCancelUserId("")
+      setIsCancelOpen(false);
+  };
+
+  const confirmCancel = async (userId : string) => {
+      if (!userId || !activityId) return;
+      const success = await cancelRegistration(userId, activityId);
+
+      if (success) {
+          toast.success("ลบชื่อผู้เข้าร่วมกิจกรรมสำเร็จ");
+      }
+      fetchParticipants()
+      closeCancelModal();
   };
 
   useEffect(() => {
@@ -129,6 +155,7 @@ function ViewParticipantsPage() {
   }, []);
 
   return (
+  <>
     <div className="p-10 pt-25">
       <style>{customStyles}</style>
 
@@ -146,13 +173,13 @@ function ViewParticipantsPage() {
       </div>
 
       {isLoading && (
-        <p className="text-gray-500 text-center mt-10">กำลังโหลด...</p>
+        <p className="text-gray-500 text-center">กำลังโหลด...</p>
       )}
 
       {!isLoading && participants.length === 0 && (
-        <div className="text-center mt-25">
-          <p className="text-gray-500 text-lg">ยังไม่มีผู้เข้าร่วมกิจกรรมนี้</p>
-        </div>
+          <p className="text-center text-gray-500">
+            ยังไม่มีผู้เข้าร่วมกิจกรรมนี้
+          </p>
       )}
 
       {!isLoading && participants.length > 0 && (
@@ -169,6 +196,7 @@ function ViewParticipantsPage() {
                 <th className="p-3 border-x text-white bg-emerald-700">เบอร์โทร</th>
                 <th className="p-3 border-x text-white bg-emerald-700">Line ID</th>
                 <th className="p-3 border-x text-white bg-emerald-700">อายุ</th>
+                <th className="p-3 border-x text-white bg-emerald-700"></th>
               </tr>
             </thead>
 
@@ -195,6 +223,14 @@ function ViewParticipantsPage() {
                   <td className="p-3 border border-gray-400 shadow text-center">
                     {p.participants.age}
                   </td>
+                  <td className="p-3 border border-gray-400 shadow text-center">
+                    <button 
+                        onClick={() => openCancelModal(p.userId)} 
+                        className="text-red-400 cursor-pointer hover:text-red-600"
+                    >
+                        <FaTrash size={22}/>
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -202,6 +238,38 @@ function ViewParticipantsPage() {
         </div>
       )}
     </div>
+    {isCancelOpen && (
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-80">
+
+              <h2 className="text-xl font-bold text-red-600 mb-4 text-center">
+                  ยืนยันการลบชื่อผู้เข้าร่วม?
+              </h2>
+
+              <p className="text-center text-gray-700 mb-6">
+                  คุณแน่ใจหรือไม่ว่าต้องการลบชื่อผู้เข้าร่วมกิจกรรมรายนี้?
+              </p>
+
+              <div className="flex justify-between">
+                  <button
+                      onClick={closeCancelModal}
+                      className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 cursor-pointer"
+                  >
+                      ยกเลิก
+                  </button>
+
+                  <button
+                      onClick={() => confirmCancel(cancelUserId)}
+                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 cursor-pointer"
+                  >
+                      ยืนยัน
+                  </button>
+              </div>
+
+          </div>
+      </div>
+  )}
+  </>
   );
 }
 

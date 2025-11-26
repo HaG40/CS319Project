@@ -1,86 +1,162 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa";
 import type { Activity } from "../../types/Activity";
 import formatDate from "../../utils/FormatDate";
+import "datatables.net-dt";
+import "datatables.net-dt/css/dataTables.dataTables.css";
+import DataTable from "datatables.net-dt";
 
-function ViewRegisteredAct () {
-    const { userId } = useParams<{ userId: string }>();
-    const [ registeredActivities, setRegisteredActivities ] = useState([])
-    const location = useLocation();
-    const navigate = useNavigate();
-    const targetUsername = location.state?.username || "User";
+function ViewRegisteredAct() {
+  const { userId } = useParams<{ userId: string }>();
+  const [registeredActivities, setRegisteredActivities] = useState<Activity[]>([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [ isLoading,setIsLoading ] = useState(false)
 
-    useEffect(() => {
-        getRegisteredAct();
-    }, [])
+  const tableRef = useRef<HTMLTableElement | null>(null);
+  const dataTableInstance = useRef<any>(null);
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+  const targetUsername = location.state?.username || "User";
 
-    const goBack = () => {
-        navigate(-1);
-    };
+  useEffect(() => {
+    fetchActivities();
+  }, []);
 
-    const getRegisteredAct = async () => {  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const fetchActivities = async () => {
     try {
-        const res = await axios.get(`http://localhost:3000/api/act/registered/${userId}`);
-        setRegisteredActivities(res.data)
-        console.log(res.data)
+        setIsLoading(true);
+      const res = await axios.get(
+        `http://localhost:3000/api/act/registered/${userId}`
+      );
+      setRegisteredActivities(res.data);
     } catch (error) {
-      console.error("Error deleting user:", error);
-      alert("เกิดข้อผิดพลาดในดูข้อมูลกิจกรรมของผู้ใช้ดังกล่าว");
+      console.error(error);
+      alert("เกิดข้อผิดพลาดในการโหลดข้อมูลกิจกรรม");
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  // Init DataTable แบบ usermanager
+  useEffect(() => {
+    if (!tableRef.current) return;
+
+    if (dataTableInstance.current) {
+      dataTableInstance.current.destroy();
+      dataTableInstance.current = null;
     }
 
-  };
-    return(
-        <>
-            <div className="p-10 pt-25">
-              <div className="flex items-center gap-4 mb-6">
-                <button
-                  onClick={goBack}
-                  className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition"
-                >
-                  <FaArrowLeft />
-                  กลับ
-                </button>
-                <h1 className="text-3xl font-bold text-emerald-700">
-                  กิจกรรมที่ {targetUsername} เข้าร่วม
-                </h1>
-              </div>
-            </div>
+    if (registeredActivities.length > 0) {
+      dataTableInstance.current = new DataTable(tableRef.current, {
+        paging: true,
+        searching: true,
+        info: true,
+        pageLength: 5,
+        lengthMenu: [5, 10, 25],
+        order: [[1, "asc"]],
+        language: {
+          search: "ค้นหา:",
+          lengthMenu: "แสดง _MENU_ รายการ",
+          zeroRecords: "ไม่พบข้อมูล",
+          info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+          infoEmpty: "ไม่มีข้อมูล",
+          paginate: {
+            first: "หน้าแรก",
+            last: "สุดท้าย",
+            next: "ถัดไป",
+            previous: "ย้อนกลับ",
+          },
+        },
+      });
+    }
+  }, [registeredActivities]);
 
-            <div className="flex flex-col justify-center items-center mb-25 ">
-                {registeredActivities.length === 0 ? (
-                    <p className="text-center text-gray-500">ผู้ใช้ยังไม่ได้ลงทะเบียนเข้าร่วมกิจกรรมใดๆ</p>
-                ) : (
-                    <ul className="w-full">
-                        {registeredActivities.map((activity : Activity) => (
-                            <li key={activity.id} className=" mx-auto justify-between flex flex-row gap-6 border border-gray-300 shadow rounded-2xl bg-white p-4">
-                                <div className="flex flex-row justify-start gap-8">
-                                    <img
-                                        src={activity.image ? `http://localhost:3000${activity.image}` : 'https://placehold.co/600x400?text=No Image'}
-                                        alt={activity.title}
-                                        className="w-60 h-40 object-cover rounded-md border border-gray-300 shadow"
-                                    />
-                                    <div className="flex flex-col justify-center">
-                                        <h2 className="text-xl font-semibold text-emerald-600 mb-2">{activity.title}</h2>
-                                        <p className="text-gray-700">{activity.description}</p>
-                                        <p className="text-sm text-gray-500 mt-2"><b>เริ่ม:</b> {formatDate(activity.start_date)}</p>
-                                        <p className="text-sm text-gray-500"><b>สิ้นสุด:</b> {formatDate(activity.end_date)}</p>
-                                        <p className="text-sm text-gray-500 mt-2"><b>ประเภท:</b> {activity.category}</p>
-                                        <p className="text-sm text-gray-500"><b>จัดโดย:</b> {activity.organizer}</p>
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>            
-        </>
-    )
+  const goBack = () => navigate(-1);
+
+  return (
+    <div className="p-10 pt-25">
+      <div className="flex items-center gap-4 mb-6">
+        <button
+          onClick={goBack}
+          className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition"
+        >
+          <FaArrowLeft />
+          กลับ
+        </button>
+        
+
+        <h1 className="text-3xl font-bold text-emerald-700">
+          กิจกรรมที่ {targetUsername} เข้าร่วม
+        </h1>
+      </div>
+
+      {isLoading && (
+        <p className="text-gray-500 text-center">กำลังโหลด...</p>
+      )}
+
+      {!isLoading && registeredActivities.length === 0 && (
+        <p className="text-center text-gray-500">
+          ผู้ใช้ยังไม่ได้ลงทะเบียนเข้าร่วมกิจกรรมใดๆ
+        </p>
+      )} 
+       {!isLoading && registeredActivities.length > 0 && ( 
+        <div className="overflow-x-auto">
+          <table
+            ref={tableRef}
+            className="w-full border border-gray-400 shadow rounded-lg display"
+          >
+            <thead className="bg-emerald-700">
+              <tr>
+                <th className="p-3 border-x text-white w-3xs">ภาพ</th>
+                <th className="p-3 border-x text-white">ชื่อกิจกรรม</th>
+                <th className="p-3 border-x text-white">รายละเอียด</th>
+                <th className="p-3 border-x text-white">จัดโดย</th>
+                <th className="p-3 border-x text-white">ช่วงเวลา</th>
+                <th className="p-3 border-x text-white">ประเภท</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {registeredActivities.map((activity) => (
+                <tr key={activity.id}>
+                  <td>
+                    <img
+                      src={
+                        activity.image
+                          ? `http://localhost:3000${activity.image}`
+                          : "https://placehold.co/600x400?text=No Image"
+                      }
+                      alt={activity.title}
+                      className="act-image"
+                    />
+                  </td>
+
+                  <td className="font-semibold text-emerald-700">{activity.title}</td>
+
+                  <td className="text-gray-700">{activity.description}</td>
+
+                  <td className="text-gray-700">{activity.organizer}</td>
+
+                  <td className="text-gray-700">
+                    <p><b>เริ่ม:</b> {formatDate(activity.start_date)}</p>
+                    <p><b>สิ้นสุด:</b> {formatDate(activity.end_date)}</p>
+                  </td>
+
+                  <td className="text-gray-700">{activity.category}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default ViewRegisteredAct
+export default ViewRegisteredAct;

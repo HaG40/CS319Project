@@ -118,10 +118,11 @@ function UserManager() {
         email: "",
         role: "",
       });
-      await fetchUsers();
     } catch (error) {
       console.error("Error saving user:", error);
       alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    } finally {
+      await fetchUsers();
     }
   };
 
@@ -140,10 +141,11 @@ function UserManager() {
     try {
       await axios.delete(`http://localhost:3000/api/user/delete/${deleteUserId}`);
       closeDeleteModal();
-      await fetchUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
       alert("เกิดข้อผิดพลาดในการลบผู้ใช้");
+    } finally {
+      fetchUsers();
     }
   };
 
@@ -165,13 +167,13 @@ function UserManager() {
           className="w-full border border-gray-400 shadow rounded-lg display"
           style={{ width: "100%" }}
         >
-          <thead className="bg-emerald-100">
+          <thead className="bg-emerald-700">
             <tr>
-              <th className="p-3 border-x text-white bg-emerald-700">Username</th>
-              <th className="p-3 border-x text-white bg-emerald-700">ชื่อ - นามสกุล</th>
-              <th className="p-3 border-x text-white bg-emerald-700">Email</th>
-              <th className="p-3 border-x text-white bg-emerald-700">Role</th>
-              <th className="p-3 border-x text-white bg-emerald-700 w-40">Actions</th>
+              <th className="p-3 border-x text-white">Username</th>
+              <th className="p-3 border-x text-white">ชื่อ - นามสกุล</th>
+              <th className="p-3 border-x text-white">Email</th>
+              <th className="p-3 border-x text-white">Role</th>
+              <th className="p-3 border-x text-white w-40">Actions</th>
             </tr>
           </thead>
 

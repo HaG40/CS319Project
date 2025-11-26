@@ -250,6 +250,10 @@ router.delete("/delete/:id", async (req: Request, res: Response) => {
       if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
     }
 
+    await prisma.activityRegistration.deleteMany({
+      where: { activityId: id },
+    });
+    
     await prisma.activity.delete({ where: { id } });
 
     res.json({ message: "Activity deleted" });
